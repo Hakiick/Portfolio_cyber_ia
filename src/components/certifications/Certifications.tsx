@@ -1,5 +1,6 @@
 import { CyberSection } from "../ui/CyberSection";
 import { CyberBadge } from "../ui/CyberBadge";
+import { ScrollReveal } from "../ui/ScrollReveal";
 import {
   certifications,
   type CertificationStatus,
@@ -104,8 +105,10 @@ export function Certifications() {
   return (
     <CyberSection id="certifications" title="certifications_">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-        {certifications.map((cert) => (
-          <CertificationCard key={cert.nom} {...cert} />
+        {certifications.map((cert, i) => (
+          <ScrollReveal key={cert.nom} animation="slide-up" delay={i * 100}>
+            <CertificationCard {...cert} />
+          </ScrollReveal>
         ))}
       </div>
     </CyberSection>

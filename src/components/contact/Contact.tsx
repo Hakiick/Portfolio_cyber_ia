@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { CyberSection } from "../ui/CyberSection";
 import { TerminalBlock } from "../ui/TerminalBlock";
+import { ScrollReveal } from "../ui/ScrollReveal";
 import { profile } from "../../data/profile";
 
 const inputBaseStyles = [
@@ -101,26 +102,30 @@ export function Contact() {
   return (
     <CyberSection id="contact" title="contact_">
       <div className="mx-auto max-w-2xl">
-        <TerminalBlock title="contact.sh">
-          <ContactForm />
-        </TerminalBlock>
+        <ScrollReveal animation="fade-in">
+          <TerminalBlock title="contact.sh">
+            <ContactForm />
+          </TerminalBlock>
+        </ScrollReveal>
 
-        <div className="mt-6 flex flex-col items-center gap-2 font-mono text-sm">
-          <a
-            href={`mailto:${profile.email}`}
-            className="text-[var(--cyber-text-secondary)] transition-colors duration-200 hover:text-[var(--cyber-accent-green)]"
-          >
-            {profile.email}
-          </a>
-          <a
-            href={profile.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[var(--cyber-text-secondary)] transition-colors duration-200 hover:text-[var(--cyber-accent-blue)]"
-          >
-            github.com/{profile.pseudo.toLowerCase()}
-          </a>
-        </div>
+        <ScrollReveal animation="slide-up" delay={200}>
+          <div className="mt-6 flex flex-col items-center gap-2 font-mono text-sm">
+            <a
+              href={`mailto:${profile.email}`}
+              className="text-[var(--cyber-text-secondary)] transition-colors duration-200 hover:text-[var(--cyber-accent-green)]"
+            >
+              {profile.email}
+            </a>
+            <a
+              href={profile.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--cyber-text-secondary)] transition-colors duration-200 hover:text-[var(--cyber-accent-blue)]"
+            >
+              github.com/{profile.pseudo.toLowerCase()}
+            </a>
+          </div>
+        </ScrollReveal>
       </div>
     </CyberSection>
   );
