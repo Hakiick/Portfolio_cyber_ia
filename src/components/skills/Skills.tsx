@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { CyberSection } from "../ui/CyberSection";
+import { ScrollReveal } from "../ui/ScrollReveal";
 import { skills, type SkillCategory } from "../../data/skills";
 
 const CHART_SIZE = 300;
@@ -409,51 +410,53 @@ export function Skills() {
   return (
     <CyberSection id="skills" title="skills_">
       <div ref={sectionRef}>
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
-          {/* Radar Chart */}
-          <div
-            className="flex-shrink-0 w-full md:w-1/2"
-            onMouseLeave={handleLeave}
-          >
-            <RadarChart
-              scale={scale}
-              hoveredIndex={hoveredIndex}
-              onHover={handleHover}
-              onLeave={handleLeave}
-            />
-            <SkillCategoryButtons
-              hoveredIndex={hoveredIndex}
-              onSelect={handleMobileSelect}
-            />
-          </div>
+        <ScrollReveal animation="fade-in">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
+            {/* Radar Chart */}
+            <div
+              className="flex-shrink-0 w-full md:w-1/2"
+              onMouseLeave={handleLeave}
+            >
+              <RadarChart
+                scale={scale}
+                hoveredIndex={hoveredIndex}
+                onHover={handleHover}
+                onLeave={handleLeave}
+              />
+              <SkillCategoryButtons
+                hoveredIndex={hoveredIndex}
+                onSelect={handleMobileSelect}
+              />
+            </div>
 
-          {/* Detail Panel */}
-          <div className="w-full md:w-1/2 min-h-[200px]">
-            {activeCategory ? (
-              <SkillDetailPanel category={activeCategory} />
-            ) : (
-              <div
-                className="flex items-center justify-center h-full min-h-[200px] rounded-md border border-dashed p-6"
-                style={{
-                  borderColor: "var(--cyber-border)",
-                  color: "var(--cyber-text-secondary)",
-                }}
-              >
-                <p className="font-mono text-sm text-center">
-                  <span
-                    className="block mb-2 text-base"
-                    style={{ color: "var(--cyber-accent-green)" }}
-                  >
-                    [ ]
-                  </span>
-                  Survolez un axe du radar
-                  <br />
-                  pour voir le detail
-                </p>
-              </div>
-            )}
+            {/* Detail Panel */}
+            <div className="w-full md:w-1/2 min-h-[200px]">
+              {activeCategory ? (
+                <SkillDetailPanel category={activeCategory} />
+              ) : (
+                <div
+                  className="flex items-center justify-center h-full min-h-[200px] rounded-md border border-dashed p-6"
+                  style={{
+                    borderColor: "var(--cyber-border)",
+                    color: "var(--cyber-text-secondary)",
+                  }}
+                >
+                  <p className="font-mono text-sm text-center">
+                    <span
+                      className="block mb-2 text-base"
+                      style={{ color: "var(--cyber-accent-green)" }}
+                    >
+                      [ ]
+                    </span>
+                    Survolez un axe du radar
+                    <br />
+                    pour voir le detail
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </CyberSection>
   );

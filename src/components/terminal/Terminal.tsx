@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
 import CyberSection from "../ui/CyberSection";
+import { ScrollReveal } from "../ui/ScrollReveal";
 import { terminalCommands } from "../../data/terminal-commands";
 import type { TerminalCommand } from "../../data/terminal-commands";
 
@@ -228,51 +229,53 @@ export function Terminal() {
 
   return (
     <CyberSection id="terminal" title="terminal_">
-      <div className="max-w-4xl mx-auto">
-        <div
-          className="rounded-lg overflow-hidden border border-[var(--cyber-border)] hover:border-[var(--cyber-accent-green)] transition-colors duration-300"
-          style={{ boxShadow: "0 0 30px rgba(0, 255, 65, 0.05)" }}
-          onClick={handleTerminalClick}
-          role="application"
-          aria-label="Terminal interactif"
-        >
-          <TerminalHeader />
+      <ScrollReveal animation="fade-in">
+        <div className="max-w-4xl mx-auto">
           <div
-            ref={outputRef}
-            className="h-80 sm:h-96 overflow-y-auto p-4 bg-[var(--cyber-bg-terminal)]"
+            className="rounded-lg overflow-hidden border border-[var(--cyber-border)] hover:border-[var(--cyber-accent-green)] transition-colors duration-300"
+            style={{ boxShadow: "0 0 30px rgba(0, 255, 65, 0.05)" }}
+            onClick={handleTerminalClick}
+            role="application"
+            aria-label="Terminal interactif"
           >
-            <WelcomeLine text={WELCOME_MESSAGE} />
-            {history.map((entry, i) => (
-              <HistoryLine key={`${i}-${entry.command}`} entry={entry} />
-            ))}
-            <div className="flex items-start gap-0">
-              <PromptLabel />
-              <div className="relative flex-1 min-w-0">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="w-full bg-transparent text-[var(--cyber-text-primary)] font-mono text-sm outline-none border-none p-0 caret-transparent"
-                  spellCheck={false}
-                  autoComplete="off"
-                  autoCapitalize="off"
-                  aria-label="Terminal input"
-                />
-                {/* Custom blinking cursor */}
-                <span
-                  className="absolute top-0 pointer-events-none font-mono text-sm text-transparent"
-                  aria-hidden="true"
-                >
-                  {inputValue}
-                  <span className="inline-block w-[0.55em] h-[1.15em] bg-[var(--cyber-accent-green)] align-middle animate-pulse" />
-                </span>
+            <TerminalHeader />
+            <div
+              ref={outputRef}
+              className="h-80 sm:h-96 overflow-y-auto p-4 bg-[var(--cyber-bg-terminal)]"
+            >
+              <WelcomeLine text={WELCOME_MESSAGE} />
+              {history.map((entry, i) => (
+                <HistoryLine key={`${i}-${entry.command}`} entry={entry} />
+              ))}
+              <div className="flex items-start gap-0">
+                <PromptLabel />
+                <div className="relative flex-1 min-w-0">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="w-full bg-transparent text-[var(--cyber-text-primary)] font-mono text-sm outline-none border-none p-0 caret-transparent"
+                    spellCheck={false}
+                    autoComplete="off"
+                    autoCapitalize="off"
+                    aria-label="Terminal input"
+                  />
+                  {/* Custom blinking cursor */}
+                  <span
+                    className="absolute top-0 pointer-events-none font-mono text-sm text-transparent"
+                    aria-hidden="true"
+                  >
+                    {inputValue}
+                    <span className="inline-block w-[0.55em] h-[1.15em] bg-[var(--cyber-accent-green)] align-middle animate-pulse" />
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </ScrollReveal>
     </CyberSection>
   );
 }
