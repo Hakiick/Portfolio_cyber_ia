@@ -1,0 +1,182 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="404 — BREACH DETECTED">
+  <div
+    id="page-404"
+    class="relative min-h-screen flex items-center justify-center overflow-hidden"
+    style="background-color: var(--cyber-bg-primary);"
+  >
+    <!-- Scanlines overlay -->
+    <div
+      class="pointer-events-none absolute inset-0 z-10"
+      style="background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);"
+    >
+    </div>
+
+    <div class="relative z-20 text-center px-4 max-w-2xl mx-auto font-mono">
+      <!-- Error code -->
+      <p
+        class="text-8xl md:text-9xl font-bold mb-4 select-none"
+        style="color: var(--cyber-accent-red); text-shadow: 0 0 30px rgba(255,62,62,0.5), 0 0 60px rgba(255,62,62,0.3);"
+      >
+        404
+      </p>
+
+      <!-- BREACH DETECTED with glitch -->
+      <h1
+        class="text-2xl md:text-4xl font-bold mb-8 glitch-text select-none"
+        style="color: var(--cyber-accent-red);"
+        data-text="BREACH DETECTED"
+      >
+        BREACH DETECTED
+      </h1>
+
+      <!-- Fake IP tracer -->
+      <div
+        class="text-left mx-auto max-w-md mb-8 p-4 rounded border"
+        style="background-color: var(--cyber-bg-terminal); border-color: var(--cyber-accent-red); box-shadow: 0 0 20px rgba(255,62,62,0.2);"
+      >
+        <p style="color: var(--cyber-accent-red);" class="text-xs mb-2">
+          [ALERT] Unauthorized access attempt logged
+        </p>
+        <p style="color: var(--cyber-text-secondary);" class="text-xs">
+          &gt; Tracing IP address...
+        </p>
+        <p
+          id="ip-trace"
+          style="color: var(--cyber-accent-green);"
+          class="text-xs"
+        >
+        </p>
+        <p style="color: var(--cyber-text-secondary);" class="text-xs mt-2">
+          &gt; Location: <span style="color: var(--cyber-accent-blue);"
+            >Behind 7 proxies</span
+          >
+        </p>
+        <p style="color: var(--cyber-text-secondary);" class="text-xs">
+          &gt; Threat level: <span style="color: var(--cyber-accent-red);"
+            >NONE (just lost)</span
+          >
+        </p>
+      </div>
+
+      <!-- Countdown -->
+      <p
+        class="text-sm mb-6"
+        style="color: var(--cyber-text-secondary);"
+      >
+        Redirecting to safety in <span
+          id="countdown"
+          style="color: var(--cyber-accent-green);"
+          class="font-bold">5</span
+        >s...
+      </p>
+
+      <!-- Return button -->
+      <a
+        href="/"
+        class="inline-block px-6 py-3 rounded border text-sm font-bold transition-all duration-200 hover:scale-105"
+        style="border-color: var(--cyber-accent-green); color: var(--cyber-accent-green); background-color: rgba(0,255,65,0.05);"
+        onmouseover="this.style.boxShadow='0 0 20px rgba(0,255,65,0.3)'; this.style.backgroundColor='rgba(0,255,65,0.1)';"
+        onmouseout="this.style.boxShadow='none'; this.style.backgroundColor='rgba(0,255,65,0.05)';"
+      >
+        &gt; Return to safety_
+      </a>
+    </div>
+  </div>
+
+  <style>
+    .glitch-text {
+      position: relative;
+      animation: glitch-shake 2s infinite;
+    }
+
+    .glitch-text::before,
+    .glitch-text::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .glitch-text::before {
+      color: var(--cyber-accent-blue);
+      animation: glitch-clip-1 2s infinite linear alternate-reverse;
+      clip-path: inset(0 0 65% 0);
+      transform: translate(-2px, -2px);
+    }
+
+    .glitch-text::after {
+      color: var(--cyber-accent-green);
+      animation: glitch-clip-2 2s infinite linear alternate-reverse;
+      clip-path: inset(65% 0 0 0);
+      transform: translate(2px, 2px);
+    }
+
+    @keyframes glitch-shake {
+      0%, 95% { transform: translate(0); }
+      96% { transform: translate(-2px, 1px); }
+      97% { transform: translate(2px, -1px); }
+      98% { transform: translate(-1px, -2px); }
+      99% { transform: translate(1px, 2px); }
+      100% { transform: translate(0); }
+    }
+
+    @keyframes glitch-clip-1 {
+      0% { clip-path: inset(0 0 85% 0); }
+      25% { clip-path: inset(15% 0 60% 0); }
+      50% { clip-path: inset(40% 0 30% 0); }
+      75% { clip-path: inset(60% 0 15% 0); }
+      100% { clip-path: inset(80% 0 0 0); }
+    }
+
+    @keyframes glitch-clip-2 {
+      0% { clip-path: inset(80% 0 0 0); }
+      25% { clip-path: inset(60% 0 15% 0); }
+      50% { clip-path: inset(30% 0 40% 0); }
+      75% { clip-path: inset(15% 0 60% 0); }
+      100% { clip-path: inset(0 0 85% 0); }
+    }
+  </style>
+
+  <script is:inline>
+    (function () {
+      // Fake IP trace animation
+      const ipEl = document.getElementById("ip-trace");
+      const fakeOctets = [
+        Math.floor(Math.random() * 255),
+        Math.floor(Math.random() * 255),
+        Math.floor(Math.random() * 255),
+        Math.floor(Math.random() * 255),
+      ];
+      let ipText = "> IP: ";
+      let idx = 0;
+
+      function traceIP() {
+        if (idx < 4) {
+          ipText += (idx > 0 ? "." : "") + fakeOctets[idx];
+          if (ipEl) ipEl.textContent = ipText;
+          idx++;
+          setTimeout(traceIP, 300);
+        }
+      }
+      setTimeout(traceIP, 500);
+
+      // Countdown + redirect
+      let count = 5;
+      const countdownEl = document.getElementById("countdown");
+      const timer = setInterval(function () {
+        count--;
+        if (countdownEl) countdownEl.textContent = String(count);
+        if (count <= 0) {
+          clearInterval(timer);
+          window.location.href = "/";
+        }
+      }, 1000);
+    })();
+  </script>
+</Layout>
