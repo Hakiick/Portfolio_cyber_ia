@@ -1,6 +1,7 @@
 import { CyberSection } from "../ui/CyberSection";
 import { CyberCard } from "../ui/CyberCard";
 import { ScrollReveal } from "../ui/ScrollReveal";
+import { TypingBio } from "../ui/TypingBio";
 import { profile } from "../../data/profile";
 
 interface Strength {
@@ -51,14 +52,11 @@ export function About() {
         data-ctf="5 flags are hidden in this portfolio. Type 'flags' in the terminal."
       />
       <div className="relative z-10">
-        <ScrollReveal animation="fade-in">
-          <p
-            className="text-base md:text-lg leading-relaxed max-w-3xl mb-10 md:mb-14"
-            style={{ color: "var(--cyber-text-primary)" }}
-          >
-            {profile.bio}
-          </p>
-        </ScrollReveal>
+        <TypingBio
+          text={profile.bio}
+          className="text-base md:text-lg leading-relaxed max-w-3xl mb-10 md:mb-14"
+          style={{ color: "var(--cyber-text-primary)" }}
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {strengths.map((s, i) => (
