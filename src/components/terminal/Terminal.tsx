@@ -2,16 +2,71 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import type { KeyboardEvent, MouseEvent } from "react";
 import CyberSection from "../ui/CyberSection";
 import { ScrollReveal } from "../ui/ScrollReveal";
+import { MatrixRain } from "../ui/MatrixRain";
 import { terminalCommands } from "../../data/terminal-commands";
 import type { TerminalCommand } from "../../data/terminal-commands";
 
 interface HistoryEntry {
   command: string;
   output: string;
+  isStreaming?: boolean;
+}
+
+type TagColor = "green" | "blue" | "red" | "default";
+
+interface ColoredSegment {
+  text: string;
+  color: TagColor;
 }
 
 const WELCOME_MESSAGE =
   "Welcome to HakickOS v1.0\nType 'help' for available commands.";
+
+const TAG_COLORS: Record<string, TagColor> = {
+  "[OK]": "green",
+  "[FOUND]": "green",
+  "[ACCESS]": "green",
+  "[READY]": "green",
+  "[SCAN]": "blue",
+  "[INFO]": "blue",
+  "[VULN]": "red",
+  "[EXPLOIT]": "red",
+  "[RED]": "red",
+  "[ABORT]": "red",
+};
+
+const COLOR_CSS: Record<TagColor, string> = {
+  green: "var(--cyber-accent-green)",
+  blue: "var(--cyber-accent-blue)",
+  red: "var(--cyber-accent-red)",
+  default: "var(--cyber-text-secondary)",
+};
+
+function parseColoredLine(line: string): ColoredSegment[] {
+  // Check for [RED] prefix — strip it and color the whole line
+  if (line.startsWith("[RED]")) {
+    const stripped = line.slice(5);
+    return [{ text: stripped, color: "red" }];
+  }
+
+  // Check for known tags at start of line
+  for (const [tag, color] of Object.entries(TAG_COLORS)) {
+    if (tag === "[RED]") continue; // Already handled
+    if (line.startsWith(tag)) {
+      return [
+        { text: tag, color },
+        { text: line.slice(tag.length), color: "default" },
+      ];
+    }
+  }
+
+  return [{ text: line, color: "default" }];
+}
+
+function isStreamingOutput(output: string): boolean {
+  const firstLine = output.split("\n")[0];
+  return firstLine.startsWith("[SCAN]") || firstLine.startsWith("[RED]");
+}
 
 function resolveOutput(cmd: TerminalCommand, args: string[]): string {
   if (typeof cmd.output === "function") {
@@ -38,7 +93,6 @@ function findCommand(
   const multiWord = terminalCommands.find((c) => {
     const cmdParts = c.name.split(/\s+/);
     if (cmdParts.length <= 1) return false;
-    // Check if the input matches the full multi-word command name
     return trimmed.startsWith(c.name);
   });
   if (multiWord) {
@@ -67,6 +121,33 @@ function getAutoCompleteMatches(input: string): string[] {
     .map((c) => c.name);
 }
 
+function ColoredLine({ line }: { line: string }) {
+  const segments = parseColoredLine(line);
+  return (
+    <span>
+      {segments.map((seg, i) => (
+        <span key={i} style={{ color: COLOR_CSS[seg.color] }}>
+          {seg.text}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function OutputBlock({ text }: { text: string }) {
+  const lines = text.split("\n");
+  return (
+    <pre className="font-mono text-sm whitespace-pre-wrap break-words mt-1 ml-0">
+      {lines.map((line, i) => (
+        <span key={i}>
+          {i > 0 && "\n"}
+          <ColoredLine line={line} />
+        </span>
+      ))}
+    </pre>
+  );
+}
+
 function PromptLabel() {
   return (
     <span className="shrink-0 select-none font-mono text-sm" aria-hidden="true">
@@ -86,11 +167,7 @@ function HistoryLine({ entry }: { entry: HistoryEntry }) {
           {entry.command}
         </span>
       </div>
-      {entry.output && (
-        <pre className="text-[var(--cyber-text-secondary)] font-mono text-sm whitespace-pre-wrap break-words mt-1 ml-0">
-          {entry.output}
-        </pre>
-      )}
+      {entry.output && <OutputBlock text={entry.output} />}
     </div>
   );
 }
@@ -132,9 +209,12 @@ export function Terminal() {
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [inputValue, setInputValue] = useState("");
+  const [showMatrix, setShowMatrix] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
 
   const outputRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const streamTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Auto-scroll to bottom when history changes
   useEffect(() => {
@@ -143,34 +223,116 @@ export function Terminal() {
     }
   }, [history]);
 
-  const executeCommand = useCallback((rawInput: string) => {
-    const trimmed = rawInput.trim();
-    if (!trimmed) return;
+  // Cleanup streaming timers on unmount
+  useEffect(() => {
+    return () => {
+      streamTimersRef.current.forEach(clearTimeout);
+    };
+  }, []);
 
-    // Handle clear command
-    if (trimmed === "clear") {
-      setHistory([]);
+  const streamOutput = useCallback((command: string, fullOutput: string) => {
+    const lines = fullOutput.split("\n");
+    setIsStreaming(true);
+
+    // Add entry with empty output
+    setHistory((prev) => [...prev, { command, output: "", isStreaming: true }]);
+    setCommandHistory((prev) => [...prev, command]);
+    setHistoryIndex(-1);
+
+    // Clear any existing timers
+    streamTimersRef.current.forEach(clearTimeout);
+    streamTimersRef.current = [];
+
+    lines.forEach((line, i) => {
+      const timer = setTimeout(
+        () => {
+          setHistory((prev) => {
+            const updated = [...prev];
+            const last = updated[updated.length - 1];
+            if (last && last.isStreaming) {
+              const newOutput = last.output ? last.output + "\n" + line : line;
+              updated[updated.length - 1] = {
+                ...last,
+                output: newOutput,
+              };
+            }
+            return updated;
+          });
+
+          // Last line — mark streaming as done
+          if (i === lines.length - 1) {
+            setHistory((prev) => {
+              const updated = [...prev];
+              const last = updated[updated.length - 1];
+              if (last) {
+                updated[updated.length - 1] = {
+                  ...last,
+                  isStreaming: false,
+                };
+              }
+              return updated;
+            });
+            setIsStreaming(false);
+          }
+        },
+        (i + 1) * 500,
+      );
+      streamTimersRef.current.push(timer);
+    });
+  }, []);
+
+  const executeCommand = useCallback(
+    (rawInput: string) => {
+      const trimmed = rawInput.trim();
+      if (!trimmed) return;
+      if (isStreaming) return;
+
+      // Handle clear command
+      if (trimmed === "clear") {
+        setHistory([]);
+        setCommandHistory((prev) => [...prev, trimmed]);
+        setHistoryIndex(-1);
+        return;
+      }
+
+      const match = findCommand(trimmed);
+      let output: string;
+
+      if (match) {
+        output = resolveOutput(match.cmd, match.args);
+      } else {
+        output = `command not found: ${trimmed}. Type 'help' for available commands.`;
+      }
+
+      // Handle matrix special signal
+      if (output === "__MATRIX__") {
+        setShowMatrix(true);
+        setHistory((prev) => [...prev, { command: trimmed, output: "" }]);
+        setCommandHistory((prev) => [...prev, trimmed]);
+        setHistoryIndex(-1);
+        return;
+      }
+
+      // Handle streaming output (hack, rm -rf)
+      if (isStreamingOutput(output)) {
+        streamOutput(trimmed, output);
+        return;
+      }
+
+      setHistory((prev) => [...prev, { command: trimmed, output }]);
       setCommandHistory((prev) => [...prev, trimmed]);
       setHistoryIndex(-1);
-      return;
-    }
-
-    const match = findCommand(trimmed);
-    let output: string;
-
-    if (match) {
-      output = resolveOutput(match.cmd, match.args);
-    } else {
-      output = `command not found: ${trimmed}. Type 'help' for available commands.`;
-    }
-
-    setHistory((prev) => [...prev, { command: trimmed, output }]);
-    setCommandHistory((prev) => [...prev, trimmed]);
-    setHistoryIndex(-1);
-  }, []);
+    },
+    [isStreaming, streamOutput],
+  );
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
+      if (isStreaming) {
+        e.preventDefault();
+        return;
+      }
+
       if (e.key === "Enter") {
         e.preventDefault();
         executeCommand(inputValue);
@@ -216,11 +378,10 @@ export function Terminal() {
         return;
       }
     },
-    [inputValue, commandHistory, historyIndex, executeCommand],
+    [inputValue, commandHistory, historyIndex, executeCommand, isStreaming],
   );
 
   const handleTerminalClick = useCallback((e: MouseEvent<HTMLDivElement>) => {
-    // Only focus if not selecting text
     const selection = window.getSelection();
     if (!selection || selection.toString().length === 0) {
       inputRef.current?.focus();
@@ -228,55 +389,59 @@ export function Terminal() {
   }, []);
 
   return (
-    <CyberSection id="terminal" title="terminal_">
-      <ScrollReveal animation="fade-in">
-        <div className="max-w-4xl mx-auto">
-          <div
-            className="rounded-lg overflow-hidden border border-[var(--cyber-border)] hover:border-[var(--cyber-accent-green)] transition-colors duration-300"
-            style={{ boxShadow: "0 0 30px rgba(0, 255, 65, 0.05)" }}
-            onClick={handleTerminalClick}
-            role="application"
-            aria-label="Terminal interactif"
-          >
-            <TerminalHeader />
+    <>
+      {showMatrix && <MatrixRain onClose={() => setShowMatrix(false)} />}
+      <CyberSection id="terminal" title="terminal_">
+        <ScrollReveal animation="fade-in">
+          <div className="max-w-4xl mx-auto">
             <div
-              ref={outputRef}
-              className="h-80 sm:h-96 overflow-y-auto p-4 bg-[var(--cyber-bg-terminal)]"
+              className="rounded-lg overflow-hidden border border-[var(--cyber-border)] hover:border-[var(--cyber-accent-green)] transition-colors duration-300"
+              style={{ boxShadow: "0 0 30px rgba(0, 255, 65, 0.05)" }}
+              onClick={handleTerminalClick}
+              role="application"
+              aria-label="Terminal interactif"
             >
-              <WelcomeLine text={WELCOME_MESSAGE} />
-              {history.map((entry, i) => (
-                <HistoryLine key={`${i}-${entry.command}`} entry={entry} />
-              ))}
-              <div className="flex items-start gap-0">
-                <PromptLabel />
-                <div className="relative flex-1 min-w-0">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    className="w-full bg-transparent text-[var(--cyber-text-primary)] font-mono text-sm outline-none border-none p-0 caret-transparent"
-                    spellCheck={false}
-                    autoComplete="off"
-                    autoCapitalize="off"
-                    aria-label="Terminal input"
-                  />
-                  {/* Custom blinking cursor */}
-                  <span
-                    className="absolute top-0 pointer-events-none font-mono text-sm text-transparent"
-                    aria-hidden="true"
-                  >
-                    {inputValue}
-                    <span className="inline-block w-[0.55em] h-[1.15em] bg-[var(--cyber-accent-green)] align-middle animate-pulse" />
-                  </span>
+              <TerminalHeader />
+              <div
+                ref={outputRef}
+                className="h-80 sm:h-96 overflow-y-auto p-4 bg-[var(--cyber-bg-terminal)]"
+              >
+                <WelcomeLine text={WELCOME_MESSAGE} />
+                {history.map((entry, i) => (
+                  <HistoryLine key={`${i}-${entry.command}`} entry={entry} />
+                ))}
+                <div className="flex items-start gap-0">
+                  <PromptLabel />
+                  <div className="relative flex-1 min-w-0">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      className="w-full bg-transparent text-[var(--cyber-text-primary)] font-mono text-sm outline-none border-none p-0 caret-transparent"
+                      spellCheck={false}
+                      autoComplete="off"
+                      autoCapitalize="off"
+                      aria-label="Terminal input"
+                      disabled={isStreaming}
+                    />
+                    {/* Custom blinking cursor */}
+                    <span
+                      className="absolute top-0 pointer-events-none font-mono text-sm text-transparent"
+                      aria-hidden="true"
+                    >
+                      {inputValue}
+                      <span className="inline-block w-[0.55em] h-[1.15em] bg-[var(--cyber-accent-green)] align-middle animate-pulse" />
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </ScrollReveal>
-    </CyberSection>
+        </ScrollReveal>
+      </CyberSection>
+    </>
   );
 }
 
