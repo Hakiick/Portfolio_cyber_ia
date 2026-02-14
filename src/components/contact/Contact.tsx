@@ -112,6 +112,7 @@ export function Contact() {
           <div className="mt-6 flex flex-col items-center gap-2 font-mono text-sm">
             <a
               href={`mailto:${profile.email}`}
+              aria-label="Envoyer un email"
               className="text-[var(--cyber-text-secondary)] transition-colors duration-200 hover:text-[var(--cyber-accent-green)]"
             >
               {profile.email}
@@ -120,6 +121,7 @@ export function Contact() {
               href={profile.github}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Profil GitHub"
               className="text-[var(--cyber-text-secondary)] transition-colors duration-200 hover:text-[var(--cyber-accent-blue)]"
             >
               github.com/{profile.pseudo.toLowerCase()}

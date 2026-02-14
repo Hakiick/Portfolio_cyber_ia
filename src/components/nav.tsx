@@ -50,8 +50,11 @@ export default function Nav() {
     <header className="fixed-nav bg-background shadow-lg transition-all duration-300">
       {/* Desktop Navigation */}
       <div className="mx-20 hidden py-2 text-2xl md:block">
-        <nav className="my-4 flex items-center justify-between">
-          <a href="/">
+        <nav
+          className="my-4 flex items-center justify-between"
+          aria-label="Navigation principale"
+        >
+          <a href="/" aria-label="Hakick - Accueil">
             <h1 className="font-bold">LOGO</h1>
           </a>
           <ul className="flex items-center gap-8">

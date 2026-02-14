@@ -38,6 +38,8 @@ export function ClassifiedCard({
     <div
       role="button"
       tabIndex={0}
+      aria-expanded={isExpanded}
+      aria-label={`Dossier ${padIndex(index)} : ${project.titre}`}
       onClick={onToggle}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
