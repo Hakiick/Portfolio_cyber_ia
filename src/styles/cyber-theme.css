@@ -321,3 +321,36 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--cyber-accent-green);
 }
+
+/* --- CRT Mode --- */
+
+@keyframes crt-scroll {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100vh;
+  }
+}
+
+@keyframes crt-flicker {
+  0% {
+    opacity: 0.02;
+  }
+  50% {
+    opacity: 0.04;
+  }
+  100% {
+    opacity: 0.02;
+  }
+}
+
+.crt-mode {
+  filter: saturate(1.1) contrast(1.05);
+}
+
+.crt-mode * {
+  text-shadow:
+    0.5px 0 rgba(255, 0, 0, 0.15),
+    -0.5px 0 rgba(0, 255, 0, 0.15);
+}
