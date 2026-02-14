@@ -58,9 +58,7 @@ export function Projects() {
                   ? "var(--cyber-accent-green)"
                   : "var(--cyber-text-secondary)",
                 backgroundColor: "transparent",
-                boxShadow: isActive
-                  ? "var(--cyber-glow-green)"
-                  : "none",
+                boxShadow: isActive ? "var(--cyber-glow-green)" : "none",
               }}
             >
               {filter.label}
