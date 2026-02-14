@@ -1,15 +1,52 @@
+import { useState, useEffect, useRef } from "react";
 import { GlitchText } from "../ui/GlitchText";
 import { CyberButton } from "../ui/CyberButton";
 import { profile } from "../../data/profile";
 
-const ASCII_ART = `
-    ██╗  ██╗
-    ██║  ██║
-    ███████║
-    ██╔══██║
-    ██║  ██║
-    ╚═╝  ╚═╝
-`.trimEnd();
+const ASCII_HAKICK = `██╗  ██╗ █████╗ ██╗  ██╗██╗ ██████╗██╗  ██╗
+██║  ██║██╔══██╗██║ ██╔╝██║██╔════╝██║ ██╔╝
+███████║███████║█████╔╝ ██║██║     █████╔╝
+██╔══██║██╔══██║██╔═██╗ ██║██║     ██╔═██╗
+██║  ██║██║  ██║██║  ██╗██║╚██████╗██║  ██╗
+╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝ ╚═════╝╚═╝  ╚═╝`;
+
+const ASCII_H = `██╗  ██╗
+██║  ██║
+███████║
+██╔══██║
+██║  ██║
+╚═╝  ╚═╝`;
+
+const CHAR_DELAY_MS = 4;
+
+function useTypewriter(text: string, delayMs: number, startTyping: boolean) {
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+  const indexRef = useRef(0);
+
+  useEffect(() => {
+    if (!startTyping) return;
+    indexRef.current = 0;
+    setDisplayed("");
+    setDone(false);
+
+    const totalChars = text.length;
+    const interval = setInterval(() => {
+      indexRef.current += 1;
+      if (indexRef.current >= totalChars) {
+        setDisplayed(text);
+        setDone(true);
+        clearInterval(interval);
+      } else {
+        setDisplayed(text.slice(0, indexRef.current));
+      }
+    }, delayMs);
+
+    return () => clearInterval(interval);
+  }, [text, delayMs, startTyping]);
+
+  return { displayed, done };
+}
 
 function getShortBio(bio: string): string {
   const sentences = bio.split(". ");
@@ -17,6 +54,42 @@ function getShortBio(bio: string): string {
 }
 
 export function Hero() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  const [startTyping, setStartTyping] = useState(false);
+
+  useEffect(() => {
+    const w = window.innerWidth;
+    setIsMobile(w < 640);
+    setIsTablet(w >= 640 && w < 1024);
+
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 640);
+      setIsTablet(width >= 640 && width < 1024);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setStartTyping(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const asciiText = isMobile ? ASCII_H : ASCII_HAKICK;
+  const { displayed, done } = useTypewriter(
+    asciiText,
+    CHAR_DELAY_MS,
+    startTyping,
+  );
+
+  const fontSizeClass = isMobile
+    ? "text-xs"
+    : isTablet
+      ? "text-[0.5rem] sm:text-xs"
+      : "text-xs md:text-sm lg:text-base";
+
   return (
     <section
       id="hero"
@@ -28,13 +101,18 @@ export function Hero() {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 text-center max-w-3xl mx-auto">
+      <div className="relative z-10 text-center max-w-4xl mx-auto">
         <pre
-          className="font-mono text-xs sm:text-sm md:text-base leading-tight mb-6 select-none"
+          className={`font-mono ${fontSizeClass} leading-tight mb-6 select-none whitespace-pre`}
           style={{ color: "var(--cyber-accent-green)" }}
-          aria-hidden="true"
+          aria-label="HAKICK"
         >
-          {ASCII_ART}
+          {displayed}
+          {!done && startTyping && (
+            <span className="animate-pulse" style={{ opacity: 1 }}>
+              ▌
+            </span>
+          )}
         </pre>
 
         <GlitchText
