@@ -354,3 +354,52 @@ body {
     0.5px 0 rgba(255, 0, 0, 0.15),
     -0.5px 0 rgba(0, 255, 0, 0.15);
 }
+
+/* --- Konami Code / God Mode --- */
+
+@keyframes konami-flash {
+  0% {
+    background-color: rgba(0, 255, 65, 0.6);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes konami-toast {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  5% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  90% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+}
+
+.konami-active {
+  animation: konami-glow-pulse 0.5s ease-in-out infinite alternate;
+}
+
+.konami-active * {
+  text-shadow:
+    0 0 10px rgba(0, 255, 65, 0.5),
+    0 0 20px rgba(0, 255, 65, 0.3) !important;
+}
+
+@keyframes konami-glow-pulse {
+  0% {
+    filter: brightness(1) saturate(1);
+  }
+  100% {
+    filter: brightness(1.1) saturate(1.3);
+  }
+}
