@@ -1,5 +1,6 @@
 import { cn } from "../../lib/utils";
 import type { ReactNode } from "react";
+import { DecryptText } from "./DecryptText";
 
 export interface CyberSectionProps {
   id: string;
@@ -31,7 +32,7 @@ export function CyberSection({
     <section id={id} className={cn(sectionStyles, className)}>
       <h2 className={titleStyles}>
         <span aria-hidden="true">&gt; </span>
-        {title}
+        <DecryptText text={title} as="span" />
         <span
           aria-hidden="true"
           className="inline-block w-[0.5em] h-[1.1em] ml-1 bg-[var(--cyber-accent-green)] align-middle animate-typing-cursor"
