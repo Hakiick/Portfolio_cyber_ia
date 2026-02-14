@@ -1,6 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import BootSequence from "../components/boot/BootSequence";
+import Hero from "../components/hero/Hero";
+import About from "../components/about/About";
 
 const title = "Hakick — AI Security Engineer | Portfolio";
 ---
@@ -8,15 +10,7 @@ const title = "Hakick — AI Security Engineer | Portfolio";
 <Layout title={title}>
   <main>
     <BootSequence client:load />
-    <section id="hero" class="min-h-screen flex items-center justify-center">
-      <div class="text-center">
-        <h1 class="text-4xl md:text-6xl font-bold font-mono text-glow-green" style="color: var(--cyber-accent-green)">
-          Hakick
-        </h1>
-        <p class="mt-4 text-xl" style="color: var(--cyber-text-secondary)">
-          AI Security Engineer in the making
-        </p>
-      </div>
-    </section>
+    <Hero client:load />
+    <About client:load />
   </main>
 </Layout>
