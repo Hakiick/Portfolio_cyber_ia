@@ -32,9 +32,43 @@
 > Les agents ci-dessous sont créés automatiquement en fonction de la stack et des US du projet.
 > Chaque agent est un expert de son domaine dans la stack spécifique du projet.
 
-<!-- /init-project remplacera cette section avec les agents générés -->
+### `astro-react-dev`
+**Rôle** : Développeur frontend principal — Astro 4.13 + React 18
+**Skill** : `/astro-react-dev`
+**Domaine** : Composants React interactifs, pages Astro, layouts, data layer TypeScript
+**US assignées** : US-01 à US-08, US-10, US-11, US-12
+**Responsabilités** :
+- Créer les composants React (`.tsx`) avec `client:load` ou `client:visible`
+- Structurer les pages et layouts Astro
+- Implémenter les fichiers de données TypeScript (`src/data/`)
+- Gérer la navigation scroll-aware, le terminal interactif, les sections
+- Assurer le responsive mobile-first
+- Utiliser les composants UI du design system
 
-_Pas encore initialisé. Lance `/init-project` pour générer les agents spécialisés._
+### `threejs-dev`
+**Rôle** : Développeur 3D — Three.js / WebGL
+**Skill** : `/threejs-dev`
+**Domaine** : Brain 3D neural network, animations WebGL, performance GPU
+**US assignées** : US-09
+**Responsabilités** :
+- Implémenter le réseau de neurones 3D (Brain3D.tsx)
+- Gérer la réactivité souris + parallax scroll
+- Assurer le lazy-loading de Three.js
+- Fournir le fallback CSS si WebGL non supporté
+- Maintenir les 60fps et l'opacité 0.3-0.4
+- Masquer le Brain sur mobile
+
+### `ui-integrator`
+**Rôle** : Spécialiste design system cyber — Tailwind CSS + effets visuels
+**Skill** : `/ui-integrator`
+**Domaine** : Variables CSS, composants UI réutilisables, animations glitch/glow/néon
+**US assignées** : US-01, US-11, US-12
+**Responsabilités** :
+- Maintenir `cyber-theme.css` et les variables CSS
+- Créer et maintenir les composants UI (CyberButton, CyberCard, CyberBadge, etc.)
+- Implémenter les effets visuels (glitch, glow, scan lines, néon)
+- Assurer la cohérence du design system sur toutes les sections
+- Vérifier le contraste WCAG AA et l'accessibilité visuelle
 
 ---
 
