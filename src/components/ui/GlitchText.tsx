@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, type CSSProperties } from "react";
 import { cn } from "../../lib/utils";
 
 export interface GlitchTextProps {
@@ -6,6 +6,7 @@ export interface GlitchTextProps {
   as?: "h1" | "h2" | "h3" | "span";
   intensity?: "subtle" | "medium" | "strong";
   className?: string;
+  style?: CSSProperties;
 }
 
 const INTENSITY_INTERVAL: Record<"medium" | "strong", number> = {
@@ -20,6 +21,7 @@ export function GlitchText({
   as: Tag = "span",
   intensity = "subtle",
   className,
+  style,
 }: GlitchTextProps) {
   const elementRef = useRef<HTMLElement | null>(null);
 
@@ -44,6 +46,7 @@ export function GlitchText({
       ref={elementRef as React.Ref<never>}
       data-text={text}
       className={cn("glitch-effect", className)}
+      style={style}
     >
       {text}
     </Tag>
