@@ -7,6 +7,8 @@ import Skills from "../components/skills/Skills";
 import Projects from "../components/projects/Projects";
 import Certifications from "../components/certifications/Certifications";
 import Timeline from "../components/timeline/Timeline";
+import Contact from "../components/contact/Contact";
+import Footer from "../components/footer/Footer";
 
 const title = "Hakick — AI Security Engineer | Portfolio";
 ---
@@ -20,5 +22,7 @@ const title = "Hakick — AI Security Engineer | Portfolio";
     <Projects client:visible />
     <Certifications client:visible />
     <Timeline client:visible />
+    <Contact client:visible />
   </main>
+  <Footer client:load />
 </Layout>
