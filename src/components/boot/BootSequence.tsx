@@ -11,15 +11,51 @@ interface BootLine {
 }
 
 const BOOT_LINES: BootLine[] = [
-  { tag: "[BIOS]", text: "Initializing HakickOS v1.0...", color: "var(--cyber-accent-purple)" },
-  { tag: "[OK]", text: "Loading kernel modules", color: "var(--cyber-accent-green)" },
-  { tag: "[OK]", text: "Mounting secure filesystem", color: "var(--cyber-accent-green)" },
-  { tag: "[OK]", text: "Starting network interfaces", color: "var(--cyber-accent-green)" },
-  { tag: "[SCAN]", text: "Running port scan... 443/tcp open", color: "var(--cyber-accent-blue)" },
-  { tag: "[OK]", text: "Firewall rules applied", color: "var(--cyber-accent-green)" },
-  { tag: "[OK]", text: "Loading AI models...", color: "var(--cyber-accent-green)" },
-  { tag: "[OK]", text: "Neural network initialized", color: "var(--cyber-accent-green)" },
-  { tag: "[READY]", text: "System boot complete.", color: "var(--cyber-accent-green)" },
+  {
+    tag: "[BIOS]",
+    text: "Initializing HakickOS v1.0...",
+    color: "var(--cyber-accent-purple)",
+  },
+  {
+    tag: "[OK]",
+    text: "Loading kernel modules",
+    color: "var(--cyber-accent-green)",
+  },
+  {
+    tag: "[OK]",
+    text: "Mounting secure filesystem",
+    color: "var(--cyber-accent-green)",
+  },
+  {
+    tag: "[OK]",
+    text: "Starting network interfaces",
+    color: "var(--cyber-accent-green)",
+  },
+  {
+    tag: "[SCAN]",
+    text: "Running port scan... 443/tcp open",
+    color: "var(--cyber-accent-blue)",
+  },
+  {
+    tag: "[OK]",
+    text: "Firewall rules applied",
+    color: "var(--cyber-accent-green)",
+  },
+  {
+    tag: "[OK]",
+    text: "Loading AI models...",
+    color: "var(--cyber-accent-green)",
+  },
+  {
+    tag: "[OK]",
+    text: "Neural network initialized",
+    color: "var(--cyber-accent-green)",
+  },
+  {
+    tag: "[READY]",
+    text: "System boot complete.",
+    color: "var(--cyber-accent-green)",
+  },
 ];
 
 const WELCOME_LINE = "> Welcome, visitor. Initializing portfolio...";
@@ -54,8 +90,11 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
   const [visible, setVisible] = useState(true);
   const [visibleLines, setVisibleLines] = useState(0);
   const [showWelcome, setShowWelcome] = useState(false);
-  const [phase, setPhase] = useState<"typing" | "glitching" | "fading">("typing");
+  const [phase, setPhase] = useState<"typing" | "glitching" | "fading">(
+    "typing",
+  );
   const [glitchBands, setGlitchBands] = useState<React.CSSProperties[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const completedRef = useRef(false);
 
   const totalLines = BOOT_LINES.length;
@@ -82,8 +121,9 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
     }, GLITCH_DURATION_MS);
   }, [onComplete]);
 
-  // Check sessionStorage on mount
+  // Check sessionStorage on mount and mark hydrated
   useEffect(() => {
+    setHydrated(true);
     try {
       if (sessionStorage.getItem(SESSION_KEY) === "true") {
         setVisible(false);
@@ -131,7 +171,8 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
     justifyContent: "center",
     padding: "1.5rem",
     opacity: phase === "fading" ? 0 : 1,
-    transition: phase === "fading" ? `opacity ${FADE_DURATION_MS}ms ease-out` : undefined,
+    transition:
+      phase === "fading" ? `opacity ${FADE_DURATION_MS}ms ease-out` : undefined,
     willChange: "opacity",
   };
 
@@ -152,9 +193,17 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
   };
 
   return (
-    <div data-testid="boot-sequence" style={overlayStyle}>
+    <div
+      data-testid="boot-sequence"
+      data-hydrated={hydrated ? "true" : undefined}
+      style={overlayStyle}
+    >
       {phase === "glitching" ? (
-        <GlitchOverlay bands={glitchBands} lines={BOOT_LINES} visibleLines={visibleLines} />
+        <GlitchOverlay
+          bands={glitchBands}
+          lines={BOOT_LINES}
+          visibleLines={visibleLines}
+        />
       ) : (
         <BootContent
           lines={BOOT_LINES}
@@ -168,8 +217,12 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
           data-testid="boot-skip"
           style={skipStyle}
           onClick={handleComplete}
-          onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.5"; }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = "1";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = "0.5";
+          }}
         >
           Skip
         </button>
@@ -185,7 +238,12 @@ interface BootContentProps {
   isTyping: boolean;
 }
 
-function BootContent({ lines, visibleLines, showWelcome, isTyping }: BootContentProps) {
+function BootContent({
+  lines,
+  visibleLines,
+  showWelcome,
+  isTyping,
+}: BootContentProps) {
   const containerStyle: React.CSSProperties = {
     maxWidth: "600px",
     width: "100%",
@@ -199,8 +257,12 @@ function BootContent({ lines, visibleLines, showWelcome, isTyping }: BootContent
       {lines.slice(0, visibleLines).map((line, i) => (
         <div key={i} style={{ opacity: 1 }}>
           <span style={{ color: line.color, fontWeight: 700 }}>{line.tag}</span>{" "}
-          <span style={{ color: "var(--cyber-text-primary)" }}>{line.text}</span>
-          {i === visibleLines - 1 && !showWelcome && isTyping && <BlinkingCursor />}
+          <span style={{ color: "var(--cyber-text-primary)" }}>
+            {line.text}
+          </span>
+          {i === visibleLines - 1 && !showWelcome && isTyping && (
+            <BlinkingCursor />
+          )}
         </div>
       ))}
       {visibleLines === lines.length && showWelcome && (
@@ -240,7 +302,14 @@ interface GlitchOverlayProps {
 
 function GlitchOverlay({ bands, lines, visibleLines }: GlitchOverlayProps) {
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+      }}
+    >
       {bands.map((bandStyle, i) => (
         <div key={i} style={bandStyle}>
           <div
@@ -254,8 +323,12 @@ function GlitchOverlay({ bands, lines, visibleLines }: GlitchOverlayProps) {
           >
             {lines.slice(0, visibleLines).map((line, j) => (
               <div key={j}>
-                <span style={{ color: line.color, fontWeight: 700 }}>{line.tag}</span>{" "}
-                <span style={{ color: "var(--cyber-text-primary)" }}>{line.text}</span>
+                <span style={{ color: line.color, fontWeight: 700 }}>
+                  {line.tag}
+                </span>{" "}
+                <span style={{ color: "var(--cyber-text-primary)" }}>
+                  {line.text}
+                </span>
               </div>
             ))}
           </div>
