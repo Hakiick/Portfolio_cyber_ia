@@ -54,6 +54,13 @@ import "../styles/cyber-theme.css";
     <title>{title}</title>
   </head>
   <body>
+    <!-- FLAG{s0urc3_c0d3_1nsp3ct0r} — Nice find! 2/5 flags discovered. -->
     <slot />
+    <script is:inline>
+      console.log(
+        "%c🚩 FLAG{c0ns0l3_h4ck3r_pr0} — 3/5 flags. Keep going!",
+        "color: #00ff41; font-size: 16px; font-weight: bold; text-shadow: 0 0 10px #00ff41;"
+      );
+    </script>
   </body>
 </html>
