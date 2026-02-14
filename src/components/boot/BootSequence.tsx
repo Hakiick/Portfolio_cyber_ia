@@ -216,6 +216,7 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
         <button
           data-testid="boot-skip"
           style={skipStyle}
+          aria-label="Skip boot animation"
           onClick={handleComplete}
           onMouseEnter={(e) => {
             e.currentTarget.style.opacity = "1";

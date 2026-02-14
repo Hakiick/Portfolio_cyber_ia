@@ -30,8 +30,11 @@ export function MobileNav() {
 
   return (
     <div className="relative py-2 text-4xl md:hidden">
-      <nav className="my-4 flex items-center justify-between">
-        <a href="/">
+      <nav
+        className="my-4 flex items-center justify-between"
+        aria-label="Navigation mobile"
+      >
+        <a href="/" aria-label="Hakick - Accueil">
           <p className="text-2xl font-bold">Logo</p>
         </a>
         <div className="flex items-center gap-2">
@@ -41,6 +44,8 @@ export function MobileNav() {
                 <NavigationMenuTrigger
                   onClick={() => setIsOpen(!isOpen)}
                   className="h-14 px-4 text-xl lg:h-16 lg:px-3"
+                  aria-label="Ouvrir le menu de navigation"
+                  aria-expanded={isOpen}
                 >
                   ☰
                 </NavigationMenuTrigger>

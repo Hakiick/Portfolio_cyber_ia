@@ -51,6 +51,7 @@ export function Projects() {
                 key={filter.label}
                 type="button"
                 onClick={() => handleFilterChange(filter.label)}
+                aria-pressed={isActive}
                 className="rounded border px-3 py-1.5 font-mono text-xs transition-all duration-200 sm:px-4 sm:py-2 sm:text-sm"
                 style={{
                   borderColor: isActive
