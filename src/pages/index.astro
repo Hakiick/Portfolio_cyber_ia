@@ -1,18 +1,28 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Hero from "../components/hero.astro";
-import Services from "../components/services.astro";
-import MoreService from "../components/moreService.astro";
-import Faq from "../components/faq";
-//adjust these variable to change your content
-const title = "Your Company - What You Do";
+import { HeroPlaceholder } from "../components/hero/HeroPlaceholder";
+import { AboutPlaceholder } from "../components/about/AboutPlaceholder";
+import { SkillsPlaceholder } from "../components/skills/SkillsPlaceholder";
+import { ProjectsPlaceholder } from "../components/projects/ProjectsPlaceholder";
+import { CertificationsPlaceholder } from "../components/certifications/CertificationsPlaceholder";
+import { TimelinePlaceholder } from "../components/timeline/TimelinePlaceholder";
+import { TerminalPlaceholder } from "../components/terminal/TerminalPlaceholder";
+import { ContactPlaceholder } from "../components/contact/ContactPlaceholder";
+import { Footer } from "../components/footer/Footer";
+
+const title = "Hakick — AI Security Engineer";
 ---
 
 <Layout title={title}>
   <main>
-    <Hero />
-    <MoreService />
-    <Services />
-    <Faq client:load />
+    <HeroPlaceholder client:load />
+    <AboutPlaceholder client:load />
+    <SkillsPlaceholder client:load />
+    <ProjectsPlaceholder client:load />
+    <CertificationsPlaceholder client:load />
+    <TimelinePlaceholder client:load />
+    <TerminalPlaceholder client:load />
+    <ContactPlaceholder client:load />
   </main>
+  <Footer client:load />
 </Layout>

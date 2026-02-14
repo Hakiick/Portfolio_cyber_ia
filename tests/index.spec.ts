@@ -1,74 +1,115 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Home Page", () => {
-  test.beforeEach(async ({ page }) => await page.goto("localhost:4321"));
-
-  test("Correct title", async ({ page }) => {
-    await expect(page).toHaveTitle("Your Company - What You Do");
+test.describe("Home Page — Layout & Navigation", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("http://localhost:4321");
   });
 
-  test("navigation links exist, can be clicked and redirect", async ({
-    page,
-  }) => {
+  test("page has correct title", async ({ page }) => {
+    await expect(page).toHaveTitle("Hakick — AI Security Engineer");
+  });
+
+  test("navigation header is visible", async ({ page }) => {
+    const nav = page.locator('[data-testid="nav-header"]');
+    await expect(nav).toBeVisible();
+  });
+
+  test("all sections exist on the page", async ({ page }) => {
+    const sectionIds = [
+      "hero",
+      "about",
+      "skills",
+      "projects",
+      "certifications",
+      "timeline",
+      "terminal",
+      "contact",
+    ];
+
+    for (const id of sectionIds) {
+      const section = page.locator(`#${id}`);
+      await expect(section).toBeAttached();
+    }
+  });
+
+  test("desktop nav links are visible", async ({ page }) => {
+    const navLinks = [
+      "About",
+      "Skills",
+      "Projects",
+      "Certifs",
+      "Timeline",
+      "Terminal",
+      "Contact",
+    ];
+
+    for (const label of navLinks) {
+      const link = page.locator(`[data-testid="nav-link-${label}"]`);
+      await expect(link).toBeVisible();
+    }
+  });
+
+  test("clicking nav link triggers scroll to section", async ({ page }) => {
+    // Wait for hydration
+    await page.waitForLoadState("networkidle");
+
     const aboutLink = page.locator('[data-testid="nav-link-About"]');
-    const servicesLink = page.locator('[data-testid="nav-link-Services"]');
-    const reviewsLink = page.locator('[data-testid="nav-link-Reviews"]');
-    const contactLink = page.locator('[data-testid="nav-link-Contact"]');
-    const faqLink = page.locator('[data-testid="nav-link-FAQ"]');
-
-    await expect(aboutLink).toBeVisible();
     await aboutLink.click();
-    await expect(page).toHaveURL("http://localhost:4321/About");
 
-    await expect(servicesLink).toBeVisible();
-    await servicesLink.click();
-    await expect(page).toHaveURL("http://localhost:4321/Services");
+    // Give smooth scroll time, then check position
+    await page.waitForTimeout(2000);
 
-    await expect(reviewsLink).toBeVisible();
-    await reviewsLink.click();
-    await expect(page).toHaveURL("http://localhost:4321/Reviews");
-
-    await expect(contactLink).toBeVisible();
-    await contactLink.click();
-    await expect(page).toHaveURL("http://localhost:4321/Contact");
-
-    await expect(faqLink).toBeVisible();
-    await faqLink.click();
-    await expect(page).toHaveURL("http://localhost:4321/#FAQ");
+    // Verify the about section is near the top of the viewport
+    const aboutRect = await page.locator("#about").boundingBox();
+    expect(aboutRect).not.toBeNull();
+    // Section should have scrolled into or near the viewport
+    // (its top should be less than viewport height)
+    if (aboutRect) {
+      expect(aboutRect.y).toBeLessThan(800);
+    }
   });
 
-  test("desktop theme toggle works", async ({ page }) => {
-    const themeToggle = page.locator('[data-testid="theme-toggle-desktop"]');
-    await expect(themeToggle).toBeVisible();
-    await themeToggle.click();
-    await expect(page.locator("body")).toHaveClass(/dark/);
-    await themeToggle.click();
+  test("mobile menu opens and closes", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("http://localhost:4321");
+    await page.waitForLoadState("networkidle");
+
+    const menuToggle = page.locator('[data-testid="mobile-menu-toggle"]');
+    await expect(menuToggle).toBeVisible();
+
+    await menuToggle.click();
+    await page.waitForTimeout(300);
+
+    const overlay = page.locator('[data-testid="mobile-menu-overlay"]');
+    await expect(overlay).toBeVisible();
+
+    const mobileLink = page.locator('[data-testid="mobile-nav-link-About"]');
+    await expect(mobileLink).toBeVisible();
+
+    await menuToggle.click();
+    await page.waitForTimeout(300);
+    await expect(overlay).not.toBeVisible();
   });
 
-  test("hero section to have correct text", async ({ page }) => {
-    const heroImg = page.locator('[data-testid="hero-img"]');
-    const heroText = page.locator('[data-testid="hero-text"]');
-    const IntroText = page.locator('[data-testid="intro-text"]');
+  test("mobile nav link navigates and closes menu", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("http://localhost:4321");
+    await page.waitForLoadState("networkidle");
 
-    await expect(heroImg).toBeVisible();
+    const menuToggle = page.locator('[data-testid="mobile-menu-toggle"]');
+    await expect(menuToggle).toBeVisible();
+    await menuToggle.click();
+    await page.waitForTimeout(300);
 
-    await expect(heroText).toBeVisible();
-    await expect(heroText).toHaveText("Main Keywords");
+    const overlay = page.locator('[data-testid="mobile-menu-overlay"]');
+    await expect(overlay).toBeVisible();
 
-    await expect(IntroText).toBeVisible();
-    await expect(IntroText).toHaveText("brief description of services");
-  });
+    const mobileLink = page.locator('[data-testid="mobile-nav-link-Contact"]');
+    await expect(mobileLink).toBeVisible();
+    await mobileLink.click();
 
-  test("services section to have working links", async ({ page }) => {
-    await page
-      .locator("section")
-      .filter({ hasText: "Name of this service Lorem" })
-      .getByRole("link")
-      .click();
-    await expect(page).toHaveURL("http://localhost:4321/Services");
-    await page.locator("h1").filter({ hasText: "LOGO" }).click();
-    await expect(page).toHaveURL("http://localhost:4321/");
-    await page.getByRole("link", { name: "About Our Services" }).nth(1).click();
-    await expect(page).toHaveURL("http://localhost:4321/Services");
+    // Overlay should close after clicking a link
+    await page.waitForTimeout(300);
+    await expect(overlay).not.toBeVisible();
   });
 });
