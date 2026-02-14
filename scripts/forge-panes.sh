@@ -155,7 +155,7 @@ create_session() {
     printf "    %-4s %-20s %-50s\n" "1" "orchestrateur" "Team Lead (claude --dangerously-skip-permissions)"
     local i=2
     for agent in "${agents[@]}"; do
-        printf "    %-4s %-20s %-50s\n" "${i}" "${agent}" "Watcher → agent-watcher.sh ${agent}"
+        printf "    %-4s %-20s %-50s\n" "${i}" "${agent}" "Monitor passif → agent-watcher.sh ${agent}"
         i=$((i + 1))
     done
     printf "    %-4s %-20s %-50s\n" "${i}" "monitor" "Dashboard statuts agents"

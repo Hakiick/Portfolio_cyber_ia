@@ -2,16 +2,18 @@
 set -euo pipefail
 
 # ============================================
-# AGENT WATCHER — Surveille .forge/tasks/ et lance Claude
+# AGENT WATCHER — Moniteur passif d'un agent forge
+# Affiche en temps réel le statut et les résultats d'un agent.
+# Le travail est exécuté par le forge (orchestrateur) via Task() subagents.
 # Usage: bash scripts/agent-watcher.sh <agent-name> [project-dir]
 # ============================================
 
 AGENT_NAME="${1:?Usage: agent-watcher.sh <agent-name> [project-dir]}"
 PROJECT_DIR="${2:-$(pwd)}"
 FORGE_DIR="${PROJECT_DIR}/.forge"
+STATUS_FILE="${FORGE_DIR}/status/${AGENT_NAME}"
 TASK_FILE="${FORGE_DIR}/tasks/${AGENT_NAME}.md"
 RESULT_FILE="${FORGE_DIR}/results/${AGENT_NAME}.md"
-STATUS_FILE="${FORGE_DIR}/status/${AGENT_NAME}"
 POLL_INTERVAL=2
 HEARTBEAT_INTERVAL=30
 HEARTBEAT_COUNT=0
@@ -22,11 +24,12 @@ BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 GRAY='\033[0;90m'
+CYAN='\033[0;36m'
 NC='\033[0m'
 
 # Cleanup au signal
 cleanup() {
-    echo -e "\n${YELLOW}[${AGENT_NAME}]${NC} Arrêt du watcher..."
+    echo -e "\n${YELLOW}[${AGENT_NAME}]${NC} Arrêt du moniteur..."
     echo "offline" > "${STATUS_FILE}"
     exit 0
 }
@@ -37,65 +40,98 @@ mkdir -p "${FORGE_DIR}/tasks" "${FORGE_DIR}/results" "${FORGE_DIR}/status"
 echo "idle" > "${STATUS_FILE}"
 
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}  AGENT WATCHER — ${AGENT_NAME}${NC}"
+echo -e "${GREEN}  AGENT MONITOR — ${AGENT_NAME}${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GRAY}  Mode    : Passif (exécution via forge Task())${NC}"
 echo -e "${GRAY}  Projet  : ${PROJECT_DIR}${NC}"
 echo -e "${GRAY}  Tâche   : ${TASK_FILE}${NC}"
 echo -e "${GRAY}  Résultat: ${RESULT_FILE}${NC}"
 echo -e "${GRAY}  Status  : ${STATUS_FILE}${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BLUE}[${AGENT_NAME}]${NC} En attente de tâches..."
+echo -e "${BLUE}[${AGENT_NAME}]${NC} En attente — le forge orchestre l'exécution..."
 
-# Boucle principale
+PREV_STATUS="idle"
+PREV_TASK_HASH=""
+PREV_RESULT_HASH=""
+
+# Boucle principale — monitoring passif
 while true; do
-    CURRENT_STATUS=$(cat "${STATUS_FILE}" 2>/dev/null || echo "idle")
+    CURRENT_STATUS=$(cat "${STATUS_FILE}" 2>/dev/null || echo "unknown")
 
-    if [ "${CURRENT_STATUS}" = "pending" ]; then
-        # Nouvelle tâche détectée
-        echo -e "\n${YELLOW}[${AGENT_NAME}]${NC} 🔧 Tâche reçue, lancement de Claude..."
-        echo "working" > "${STATUS_FILE}"
+    # Détecter un changement de statut
+    if [ "${CURRENT_STATUS}" != "${PREV_STATUS}" ]; then
+        TIMESTAMP=$(date '+%H:%M:%S')
 
-        # Lire le contenu de la tâche
-        TASK_CONTENT=$(cat "${TASK_FILE}" 2>/dev/null || echo "Erreur: fichier tâche introuvable")
+        case "${CURRENT_STATUS}" in
+            idle)
+                echo -e "${GRAY}[${AGENT_NAME}]${NC} ⚪ idle — ${TIMESTAMP}"
+                ;;
+            pending)
+                echo -e "\n${YELLOW}[${AGENT_NAME}]${NC} 📋 Tâche assignée — ${TIMESTAMP}"
+                # Afficher le titre de la tâche
+                if [ -f "${TASK_FILE}" ]; then
+                    TASK_TITLE=$(grep -m1 '^# ' "${TASK_FILE}" 2>/dev/null | sed 's/^# //' || echo "")
+                    [ -n "${TASK_TITLE}" ] && echo -e "${GRAY}  → ${TASK_TITLE}${NC}"
+                fi
+                ;;
+            working)
+                echo -e "${BLUE}[${AGENT_NAME}]${NC} 🔧 En cours d'exécution — ${TIMESTAMP}"
+                # Afficher le contenu de la tâche
+                if [ -f "${TASK_FILE}" ]; then
+                    echo -e "${GRAY}  ┌─────────────────────────────────────────${NC}"
+                    head -20 "${TASK_FILE}" 2>/dev/null | while IFS= read -r line; do
+                        echo -e "${GRAY}  │ ${line}${NC}"
+                    done
+                    TASK_LINES=$(wc -l < "${TASK_FILE}" 2>/dev/null || echo "0")
+                    if [ "${TASK_LINES}" -gt 20 ]; then
+                        echo -e "${GRAY}  │ ... (${TASK_LINES} lignes au total)${NC}"
+                    fi
+                    echo -e "${GRAY}  └─────────────────────────────────────────${NC}"
+                fi
+                ;;
+            done)
+                echo -e "\n${GREEN}[${AGENT_NAME}]${NC} ✅ Tâche terminée — ${TIMESTAMP}"
+                # Afficher le résultat
+                if [ -f "${RESULT_FILE}" ]; then
+                    RESULT_LINES=$(wc -l < "${RESULT_FILE}" 2>/dev/null || echo "0")
+                    echo -e "${GREEN}  Résultat: ${RESULT_LINES} lignes${NC}"
+                    echo -e "${GRAY}  ┌─────────────────────────────────────────${NC}"
+                    tail -15 "${RESULT_FILE}" 2>/dev/null | while IFS= read -r line; do
+                        echo -e "${GRAY}  │ ${line}${NC}"
+                    done
+                    echo -e "${GRAY}  └─────────────────────────────────────────${NC}"
+                fi
+                ;;
+            error)
+                echo -e "\n${RED}[${AGENT_NAME}]${NC} ❌ Erreur — ${TIMESTAMP}"
+                # Afficher l'erreur
+                if [ -f "${RESULT_FILE}" ]; then
+                    echo -e "${RED}  ┌─────────────────────────────────────────${NC}"
+                    tail -10 "${RESULT_FILE}" 2>/dev/null | while IFS= read -r line; do
+                        echo -e "${RED}  │ ${line}${NC}"
+                    done
+                    echo -e "${RED}  └─────────────────────────────────────────${NC}"
+                fi
+                ;;
+            offline)
+                echo -e "${RED}[${AGENT_NAME}]${NC} ⛔ Offline — ${TIMESTAMP}"
+                ;;
+            *)
+                echo -e "${GRAY}[${AGENT_NAME}]${NC} ? ${CURRENT_STATUS} — ${TIMESTAMP}"
+                ;;
+        esac
 
-        # Construire le prompt avec contexte
-        FULL_PROMPT="Tu es l'agent '${AGENT_NAME}' dans une équipe multi-agents.
-Travaille dans le projet : ${PROJECT_DIR}
-Branche courante : $(cd "${PROJECT_DIR}" && git branch --show-current 2>/dev/null || echo 'inconnue')
-
-IMPORTANT:
-- Commite tes changements avec le format type(scope): description
-- Respecte les règles dans .claude/rules/
-- Ne touche PAS aux fichiers hors de ton scope
-- Quand tu as terminé, affiche un résumé de ce que tu as fait
-
---- TÂCHE ---
-${TASK_CONTENT}"
-
-        # Lancer Claude et capturer le résultat
-        echo -e "${BLUE}[${AGENT_NAME}]${NC} Claude en cours d'exécution..."
-        if claude --dangerously-skip-permissions \
-            -p "${FULL_PROMPT}" \
-            --output-format text \
-            > "${RESULT_FILE}" 2>&1; then
-            echo "done" > "${STATUS_FILE}"
-            echo -e "${GREEN}[${AGENT_NAME}]${NC} ✅ Tâche terminée avec succès"
-        else
-            echo "error" > "${STATUS_FILE}"
-            echo -e "${RED}[${AGENT_NAME}]${NC} ❌ Erreur lors de l'exécution"
-        fi
-
-        # Afficher un résumé du résultat
-        RESULT_LINES=$(wc -l < "${RESULT_FILE}" 2>/dev/null || echo "0")
-        echo -e "${GRAY}[${AGENT_NAME}]${NC} Résultat: ${RESULT_LINES} lignes → ${RESULT_FILE}"
-        echo -e "${BLUE}[${AGENT_NAME}]${NC} En attente de la prochaine tâche..."
+        PREV_STATUS="${CURRENT_STATUS}"
         HEARTBEAT_COUNT=0
-
     else
-        # Heartbeat discret
+        # Heartbeat discret pendant idle ou working
         HEARTBEAT_COUNT=$((HEARTBEAT_COUNT + POLL_INTERVAL))
         if [ "${HEARTBEAT_COUNT}" -ge "${HEARTBEAT_INTERVAL}" ]; then
-            echo -e "${GRAY}[${AGENT_NAME}]${NC} ⏳ idle — $(date +%H:%M:%S)"
+            if [ "${CURRENT_STATUS}" = "working" ]; then
+                echo -e "${BLUE}[${AGENT_NAME}]${NC} ⏳ working — $(date +%H:%M:%S)"
+            elif [ "${CURRENT_STATUS}" = "idle" ]; then
+                echo -e "${GRAY}[${AGENT_NAME}]${NC} ⏳ idle — $(date +%H:%M:%S)"
+            fi
             HEARTBEAT_COUNT=0
         fi
     fi

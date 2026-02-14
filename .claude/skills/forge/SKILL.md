@@ -126,11 +126,19 @@ Le mode est décidé UNE FOIS en début de Phase 3 et reste le même pour toute 
 
 ---
 
-### Mode Team Agents — Dispatch via fichiers
+### Mode Team Agents — Exécution via Task() subagents
 
-Quand le mode Team Agents est actif, le forge délègue en écrivant dans `.forge/` au lieu d'utiliser `Task()`.
+Quand le mode Team Agents est actif, le forge :
+- Écrit les tâches dans `.forge/` (pour le monitoring tmux)
+- Exécute le travail via `Task()` subagents dans sa propre session
+- Met à jour les statuts et résultats dans `.forge/` (pour la visibilité tmux)
 
-#### Écrire une tâche pour un agent
+Les panes tmux affichent passivement l'activité via `agent-watcher.sh` (moniteur passif).
+Aucune session Claude séparée n'est lancée.
+
+#### Exécuter une tâche pour un agent
+
+**Étape 1 — Écrire la tâche et signaler le démarrage** :
 
 ```bash
 cat > .forge/tasks/<agent-name>.md << 'TASK'
@@ -156,57 +164,55 @@ cat > .forge/tasks/<agent-name>.md << 'TASK'
 - Ne touche PAS aux fichiers hors scope
 TASK
 
-echo "pending" > .forge/status/<agent-name>
+echo "working" > .forge/status/<agent-name>
 ```
 
-#### Poll du résultat (attente active)
+**Étape 2 — Lancer le Task() subagent** :
+
+Utilise `Task()` avec le contenu de la tâche comme prompt. Le subagent exécute le travail
+dans la session courante du forge (pas de session Claude séparée).
+
+Le prompt du Task() doit inclure :
+- Le contenu complet de `.forge/tasks/<agent-name>.md`
+- L'identité de l'agent : "Tu es l'agent '<agent-name>'"
+- Les règles du projet
+
+**Étape 3 — Écrire le résultat et mettre à jour le statut** :
+
+Après le retour du Task() :
+- Écrire le résultat dans `.forge/results/<agent-name>.md`
+- Mettre le statut à "done" ou "error" selon le résultat
 
 ```bash
-timeout=600; elapsed=0
-while [ "$(cat .forge/status/<agent-name> 2>/dev/null)" != "done" ] && \
-      [ "$(cat .forge/status/<agent-name> 2>/dev/null)" != "error" ] && \
-      [ "$elapsed" -lt "$timeout" ]; do
-  sleep 10; elapsed=$((elapsed + 10))
-  current=$(cat .forge/status/<agent-name> 2>/dev/null || echo "unknown")
-  echo "⏳ [<agent-name>] ${current} — ${elapsed}s/${timeout}s"
-done
+echo "<résultat du Task()>" > .forge/results/<agent-name>.md
+echo "done" > .forge/status/<agent-name>
 ```
 
-Après le poll, lire le résultat :
-```bash
-cat .forge/results/<agent-name>.md
-```
-
-- Si status = "done" → évaluer le résultat (même critères que le mode Sub Agents)
-- Si status = "error" → lire le résultat pour comprendre l'erreur, puis décider : retry ou escalade
+- Si le Task() a réussi → évaluer le résultat (même critères que le mode Sub Agents)
+- Si le Task() a échoué → écrire l'erreur, mettre "error", décider : retry ou escalade
 
 #### Tâches parallèles (agents sans dépendances)
 
-Si deux agents peuvent travailler en parallèle (pas de dépendance entre eux), dispatch simultané :
+Si deux agents peuvent travailler en parallèle (pas de dépendance entre eux),
+lancer les deux Task() **en parallèle** dans un seul message (multiple tool calls).
 
 ```bash
-# Dispatch simultané
-echo "pending" > .forge/status/agent-1
-echo "pending" > .forge/status/agent-2
-
-# Attendre que TOUS terminent
-timeout=600; elapsed=0
-while { [ "$(cat .forge/status/agent-1 2>/dev/null)" != "done" ] && \
-        [ "$(cat .forge/status/agent-1 2>/dev/null)" != "error" ]; } || \
-      { [ "$(cat .forge/status/agent-2 2>/dev/null)" != "done" ] && \
-        [ "$(cat .forge/status/agent-2 2>/dev/null)" != "error" ]; }; do
-  sleep 10; elapsed=$((elapsed + 10))
-  [ "$elapsed" -ge "$timeout" ] && break
-done
+# Signaler les deux en working
+echo "working" > .forge/status/agent-1
+echo "working" > .forge/status/agent-2
 ```
+
+Puis lancer les deux Task() dans le même message. Quand chacun termine,
+écrire son résultat et mettre son statut à "done" ou "error".
 
 #### Feedback loop (Team Agents)
 
 Si le résultat d'un agent n'est pas satisfaisant :
 1. Réécrire `.forge/tasks/<agent-name>.md` avec le feedback et les corrections demandées
-2. Remettre le status à "pending" : `echo "pending" > .forge/status/<agent-name>`
-3. Re-poll le résultat
-4. Mêmes limites d'itération que le mode Sub Agents (3 dev/test, 2 review, 5 stabilizer)
+2. Remettre le statut à "working" : `echo "working" > .forge/status/<agent-name>`
+3. Relancer un Task() subagent avec le feedback
+4. Écrire le nouveau résultat, mettre à jour le statut
+5. Mêmes limites d'itération que le mode Sub Agents (3 dev/test, 2 review, 5 stabilizer)
 
 #### Mapping agents → skills
 
@@ -218,7 +224,8 @@ Le nom de l'agent dans `.forge/status/` correspond au nom du skill Claude :
 - `reviewer` → skill reviewer
 - `stabilizer` → skill stabilizer
 
-Si un agent requis par l'US n'est **pas disponible** dans `.forge/status/` (pas de pane tmux), **fallback** : utilise `Task()` en mode Sub Agents pour cet agent uniquement.
+Si un agent requis par l'US n'est **pas disponible** dans `.forge/status/` (pas de pane tmux),
+utilise `Task()` directement (même mécanisme, sans écriture dans `.forge/`).
 
 ---
 
