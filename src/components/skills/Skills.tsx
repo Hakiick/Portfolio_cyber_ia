@@ -221,7 +221,77 @@ function DataPoints({
   );
 }
 
+function useBruteForceNumber(
+  target: number,
+  delay: number,
+  active: boolean,
+): number {
+  const [display, setDisplay] = useState(0);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    if (!active) {
+      setDisplay(0);
+      return;
+    }
+
+    const duration = 800;
+    const start = performance.now() + delay;
+    let settled = false;
+
+    const tick = (now: number) => {
+      if (now < start) {
+        setDisplay(Math.floor(Math.random() * 100));
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+
+      if (progress < 1) {
+        if (progress < 0.7) {
+          setDisplay(Math.floor(Math.random() * 100));
+        } else {
+          const variance = Math.floor((1 - progress) * 20);
+          setDisplay(
+            target + Math.floor(Math.random() * variance * 2 - variance),
+          );
+        }
+        rafRef.current = requestAnimationFrame(tick);
+      } else if (!settled) {
+        settled = true;
+        setDisplay(target);
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [target, delay, active]);
+
+  return display;
+}
+
+function BruteForceValue({
+  value,
+  delay,
+  active,
+}: {
+  value: number;
+  delay: number;
+  active: boolean;
+}) {
+  const display = useBruteForceNumber(value, delay, active);
+  return <>{display}%</>;
+}
+
 function SkillDetailPanel({ category }: { category: SkillCategory }) {
+  const [animKey, setAnimKey] = useState(0);
+
+  useEffect(() => {
+    setAnimKey((k) => k + 1);
+  }, [category.id]);
+
   return (
     <div
       className="p-4 md:p-5 rounded-md border font-mono"
@@ -245,18 +315,28 @@ function SkillDetailPanel({ category }: { category: SkillCategory }) {
             color: "var(--cyber-accent-green)",
           }}
         >
-          {category.level}%
+          <BruteForceValue
+            key={`cat-${animKey}`}
+            value={category.level}
+            delay={0}
+            active={true}
+          />
         </span>
       </div>
       <ul className="space-y-3">
-        {category.items.map((skill) => (
+        {category.items.map((skill, i) => (
           <li key={skill.name}>
             <div className="flex justify-between text-xs mb-1">
               <span style={{ color: "var(--cyber-text-primary)" }}>
                 {skill.name}
               </span>
               <span style={{ color: "var(--cyber-text-secondary)" }}>
-                {skill.level}%
+                <BruteForceValue
+                  key={`${skill.name}-${animKey}`}
+                  value={skill.level}
+                  delay={i * 100}
+                  active={true}
+                />
               </span>
             </div>
             <div
@@ -264,7 +344,7 @@ function SkillDetailPanel({ category }: { category: SkillCategory }) {
               style={{ backgroundColor: "var(--cyber-border)" }}
             >
               <div
-                className="h-full rounded-full transition-all duration-500 ease-out"
+                className="h-full rounded-full"
                 style={{
                   width: `${skill.level}%`,
                   backgroundColor:
@@ -275,6 +355,8 @@ function SkillDetailPanel({ category }: { category: SkillCategory }) {
                     skill.level >= 80
                       ? "0 0 8px rgba(0,255,65,0.4)"
                       : "0 0 8px rgba(0,212,255,0.4)",
+                  transition: `width ${800 + i * 100}ms ease-out`,
+                  transitionDelay: `${i * 100}ms`,
                 }}
               />
             </div>
