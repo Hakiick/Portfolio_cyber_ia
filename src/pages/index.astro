@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import Nav from "../components/nav/Nav";
 import BootSequence from "../components/boot/BootSequence";
 import Brain3D from "../components/brain/Brain3D";
 import Hero from "../components/hero/Hero";
@@ -16,6 +17,7 @@ const title = "Hakick — AI Security Engineer | Portfolio";
 ---
 
 <Layout title={title}>
+  <Nav client:load />
   <main>
     <BootSequence client:load />
     <Brain3D client:idle />

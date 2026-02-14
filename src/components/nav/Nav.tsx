@@ -1,0 +1,341 @@
+import { useState, useEffect, useCallback, useRef } from "react";
+
+interface NavSection {
+  id: string;
+  label: string;
+}
+
+const NAV_SECTIONS: NavSection[] = [
+  { id: "about", label: "About" },
+  { id: "skills", label: "Skills" },
+  { id: "projects", label: "Projects" },
+  { id: "certifications", label: "Certs" },
+  { id: "timeline", label: "Timeline" },
+  { id: "terminal", label: "Terminal" },
+  { id: "contact", label: "Contact" },
+];
+
+export default function Nav() {
+  const [activeSection, setActiveSection] = useState<string>("");
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  // Track scroll position for nav background
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY >= 50);
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Intersection Observer for active section detection
+  useEffect(() => {
+    const visibleSections = new Map<string, IntersectionObserverEntry>();
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            visibleSections.set(entry.target.id, entry);
+          } else {
+            visibleSections.delete(entry.target.id);
+          }
+        });
+
+        // Find the topmost visible section
+        let topSection = "";
+        let topY = Infinity;
+        visibleSections.forEach((entry, id) => {
+          const rect = entry.target.getBoundingClientRect();
+          if (rect.top < topY) {
+            topY = rect.top;
+            topSection = id;
+          }
+        });
+
+        if (topSection) {
+          setActiveSection(topSection);
+        }
+      },
+      {
+        threshold: 0.3,
+        rootMargin: "-80px 0px -50% 0px",
+      },
+    );
+
+    const observer = observerRef.current;
+
+    NAV_SECTIONS.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const scrollToSection = useCallback(
+    (id: string) => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      if (menuOpen) setMenuOpen(false);
+    },
+    [menuOpen],
+  );
+
+  const scrollToHero = useCallback(() => {
+    document.getElementById("hero")?.scrollIntoView({ behavior: "smooth" });
+    if (menuOpen) setMenuOpen(false);
+  }, [menuOpen]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  return (
+    <>
+      <nav
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          height: "60px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 1rem",
+          transition: "background-color 0.3s, backdrop-filter 0.3s",
+          backgroundColor: scrolled ? "rgba(10, 10, 15, 0.95)" : "transparent",
+          backdropFilter: scrolled ? "blur(12px)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(12px)" : "none",
+        }}
+      >
+        {/* Logo */}
+        <button
+          onClick={scrollToHero}
+          aria-label="Scroll to top"
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: "var(--cyber-accent-green)",
+            fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+            fontWeight: 700,
+            fontSize: "1.5rem",
+            textShadow: "0 0 10px rgba(0, 255, 65, 0.5)",
+            padding: 0,
+            lineHeight: 1,
+          }}
+        >
+          H
+        </button>
+
+        {/* Desktop links */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "1.5rem",
+          }}
+          className="nav-desktop-links"
+        >
+          {NAV_SECTIONS.map(({ id, label }) => (
+            <button
+              key={id}
+              onClick={() => scrollToSection(id)}
+              aria-label={`Scroll to ${label}`}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+                fontSize: "0.75rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                padding: "0.25rem 0.5rem",
+                transition: "color 0.2s",
+                color:
+                  activeSection === id
+                    ? "var(--cyber-accent-green)"
+                    : "var(--cyber-text-secondary)",
+                textShadow:
+                  activeSection === id
+                    ? "0 0 10px rgba(0, 255, 65, 0.5)"
+                    : "none",
+              }}
+              onMouseEnter={(e) => {
+                if (activeSection !== id) {
+                  e.currentTarget.style.color = "var(--cyber-text-primary)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeSection !== id) {
+                  e.currentTarget.style.color = "var(--cyber-text-secondary)";
+                }
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* System tray (right zone, empty for now) */}
+        <div
+          className="nav-system-tray"
+          style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
+        />
+
+        {/* Mobile hamburger button */}
+        <button
+          className="nav-hamburger"
+          onClick={() => setMenuOpen((prev) => !prev)}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          style={{
+            display: "none",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: "4px",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "6px",
+            width: "32px",
+            height: "32px",
+          }}
+        >
+          <span
+            style={{
+              display: "block",
+              width: "24px",
+              height: "2px",
+              backgroundColor: "var(--cyber-accent-green)",
+              transition: "transform 0.3s, opacity 0.3s",
+              transform: menuOpen ? "translateY(8px) rotate(45deg)" : "none",
+            }}
+          />
+          <span
+            style={{
+              display: "block",
+              width: "24px",
+              height: "2px",
+              backgroundColor: "var(--cyber-accent-green)",
+              transition: "opacity 0.3s",
+              opacity: menuOpen ? 0 : 1,
+            }}
+          />
+          <span
+            style={{
+              display: "block",
+              width: "24px",
+              height: "2px",
+              backgroundColor: "var(--cyber-accent-green)",
+              transition: "transform 0.3s, opacity 0.3s",
+              transform: menuOpen ? "translateY(-8px) rotate(-45deg)" : "none",
+            }}
+          />
+        </button>
+      </nav>
+
+      {/* Mobile overlay menu */}
+      <div
+        className="nav-mobile-overlay"
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 49,
+          backgroundColor: "rgba(10, 10, 15, 0.98)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "2rem",
+          transition: "transform 0.3s ease, opacity 0.3s ease",
+          transform: menuOpen ? "translateX(0)" : "translateX(100%)",
+          opacity: menuOpen ? 1 : 0,
+          pointerEvents: menuOpen ? "auto" : "none",
+        }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setMenuOpen(false);
+        }}
+      >
+        {NAV_SECTIONS.map(({ id, label }) => (
+          <button
+            key={id}
+            onClick={() => scrollToSection(id)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+              fontSize: "1.5rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              padding: "0.5rem 1rem",
+              transition: "color 0.2s",
+              color:
+                activeSection === id
+                  ? "var(--cyber-accent-green)"
+                  : "var(--cyber-text-secondary)",
+              textShadow:
+                activeSection === id
+                  ? "0 0 10px rgba(0, 255, 65, 0.5)"
+                  : "none",
+            }}
+          >
+            {label}
+          </button>
+        ))}
+
+        {/* System tray in mobile menu */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            marginTop: "1rem",
+          }}
+        />
+      </div>
+
+      {/* Responsive styles */}
+      <style>{`
+        .nav-desktop-links {
+          display: flex !important;
+        }
+        .nav-hamburger {
+          display: none !important;
+        }
+        .nav-system-tray {
+          display: flex !important;
+        }
+
+        @media (max-width: 767px) {
+          .nav-desktop-links {
+            display: none !important;
+          }
+          .nav-hamburger {
+            display: flex !important;
+          }
+          .nav-system-tray {
+            display: none !important;
+          }
+        }
+      `}</style>
+    </>
+  );
+}
