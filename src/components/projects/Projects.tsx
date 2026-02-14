@@ -1,0 +1,86 @@
+import { useState, useCallback } from "react";
+
+import { CyberSection } from "../ui/CyberSection";
+import { ClassifiedCard } from "../ui/ClassifiedCard";
+import { projects, type ProjectCategory } from "../../data/projects";
+
+interface FilterConfig {
+  label: string;
+  categories: ProjectCategory[] | null;
+}
+
+const FILTERS: FilterConfig[] = [
+  { label: "Tous", categories: null },
+  { label: "IA", categories: ["ia", "ia-cyber", "ia-meta"] },
+  { label: "Cyber", categories: ["cyber", "ia-cyber"] },
+  { label: "DevOps", categories: ["devops"] },
+  { label: "IoT", categories: ["cloud-iot"] },
+];
+
+function filterProjects(categories: ProjectCategory[] | null) {
+  if (!categories) return projects;
+  return projects.filter((p) => categories.includes(p.categorie));
+}
+
+export function Projects() {
+  const [activeFilter, setActiveFilter] = useState<string>("Tous");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const activeConfig = FILTERS.find((f) => f.label === activeFilter);
+  const filteredProjects = filterProjects(activeConfig?.categories ?? null);
+
+  const handleFilterChange = useCallback((label: string) => {
+    setActiveFilter(label);
+    setExpandedId(null);
+  }, []);
+
+  const handleToggle = useCallback((id: string) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+  }, []);
+
+  return (
+    <CyberSection id="projects" title="projects_">
+      {/* Filter bar */}
+      <div className="mb-6 flex flex-wrap gap-2 sm:mb-8">
+        {FILTERS.map((filter) => {
+          const isActive = activeFilter === filter.label;
+          return (
+            <button
+              key={filter.label}
+              type="button"
+              onClick={() => handleFilterChange(filter.label)}
+              className="rounded border px-3 py-1.5 font-mono text-xs transition-all duration-200 sm:px-4 sm:py-2 sm:text-sm"
+              style={{
+                borderColor: isActive
+                  ? "var(--cyber-accent-green)"
+                  : "var(--cyber-border)",
+                color: isActive
+                  ? "var(--cyber-accent-green)"
+                  : "var(--cyber-text-secondary)",
+                backgroundColor: "transparent",
+                boxShadow: isActive ? "var(--cyber-glow-green)" : "none",
+              }}
+            >
+              {filter.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Projects grid */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+        {filteredProjects.map((project, idx) => (
+          <ClassifiedCard
+            key={project.id}
+            project={project}
+            index={idx + 1}
+            isExpanded={expandedId === project.id}
+            onToggle={() => handleToggle(project.id)}
+          />
+        ))}
+      </div>
+    </CyberSection>
+  );
+}
+
+export default Projects;
