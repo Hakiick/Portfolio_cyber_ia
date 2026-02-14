@@ -8,7 +8,9 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "npx playwright test"
+    "test": "npx playwright test",
+    "lint": "npx prettier --check src/",
+    "type-check": "npx tsc --noEmit"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.1",
