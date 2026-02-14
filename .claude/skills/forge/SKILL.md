@@ -110,6 +110,118 @@ Exécute les agents **dans l'ordre** mais avec des **boucles de correction**.
 > Après chaque agent, **évalue le résultat** avant de passer au suivant.
 > Si le résultat n'est pas satisfaisant → **renvoie** à l'agent approprié.
 
+### Détection du mode d'exécution
+
+Avant d'exécuter le pipeline, détecte le mode disponible :
+
+```bash
+# Vérifier si des agents tmux sont actifs
+FORGE_AGENTS=$(ls .forge/status/ 2>/dev/null | head -20)
+```
+
+**Si `.forge/status/` existe ET contient des agents en "idle"** → **Mode Team Agents** (délégation via fichiers)
+**Sinon** → **Mode Sub Agents** (comportement actuel via Task(), inchangé)
+
+Le mode est décidé UNE FOIS en début de Phase 3 et reste le même pour toute la pipeline.
+
+---
+
+### Mode Team Agents — Dispatch via fichiers
+
+Quand le mode Team Agents est actif, le forge délègue en écrivant dans `.forge/` au lieu d'utiliser `Task()`.
+
+#### Écrire une tâche pour un agent
+
+```bash
+cat > .forge/tasks/<agent-name>.md << 'TASK'
+# Tâche : [titre court]
+
+## Contexte
+- Projet : [chemin absolu du projet]
+- Branche : [branche courante]
+- US : [numéro et titre de l'issue]
+
+## Ce que tu dois faire
+[Description détaillée de la sous-tâche]
+
+## Fichiers concernés
+[Liste des fichiers à créer/modifier]
+
+## Critères d'acceptance
+[Liste vérifiable]
+
+## Règles
+- Respecte .claude/rules/
+- Commite avec format type(scope): description
+- Ne touche PAS aux fichiers hors scope
+TASK
+
+echo "pending" > .forge/status/<agent-name>
+```
+
+#### Poll du résultat (attente active)
+
+```bash
+timeout=600; elapsed=0
+while [ "$(cat .forge/status/<agent-name> 2>/dev/null)" != "done" ] && \
+      [ "$(cat .forge/status/<agent-name> 2>/dev/null)" != "error" ] && \
+      [ "$elapsed" -lt "$timeout" ]; do
+  sleep 10; elapsed=$((elapsed + 10))
+  current=$(cat .forge/status/<agent-name> 2>/dev/null || echo "unknown")
+  echo "⏳ [<agent-name>] ${current} — ${elapsed}s/${timeout}s"
+done
+```
+
+Après le poll, lire le résultat :
+```bash
+cat .forge/results/<agent-name>.md
+```
+
+- Si status = "done" → évaluer le résultat (même critères que le mode Sub Agents)
+- Si status = "error" → lire le résultat pour comprendre l'erreur, puis décider : retry ou escalade
+
+#### Tâches parallèles (agents sans dépendances)
+
+Si deux agents peuvent travailler en parallèle (pas de dépendance entre eux), dispatch simultané :
+
+```bash
+# Dispatch simultané
+echo "pending" > .forge/status/agent-1
+echo "pending" > .forge/status/agent-2
+
+# Attendre que TOUS terminent
+timeout=600; elapsed=0
+while { [ "$(cat .forge/status/agent-1 2>/dev/null)" != "done" ] && \
+        [ "$(cat .forge/status/agent-1 2>/dev/null)" != "error" ]; } || \
+      { [ "$(cat .forge/status/agent-2 2>/dev/null)" != "done" ] && \
+        [ "$(cat .forge/status/agent-2 2>/dev/null)" != "error" ]; }; do
+  sleep 10; elapsed=$((elapsed + 10))
+  [ "$elapsed" -ge "$timeout" ] && break
+done
+```
+
+#### Feedback loop (Team Agents)
+
+Si le résultat d'un agent n'est pas satisfaisant :
+1. Réécrire `.forge/tasks/<agent-name>.md` avec le feedback et les corrections demandées
+2. Remettre le status à "pending" : `echo "pending" > .forge/status/<agent-name>`
+3. Re-poll le résultat
+4. Mêmes limites d'itération que le mode Sub Agents (3 dev/test, 2 review, 5 stabilizer)
+
+#### Mapping agents → skills
+
+Le nom de l'agent dans `.forge/status/` correspond au nom du skill Claude :
+- `astro-react-dev` → skill astro-react-dev
+- `ui-integrator` → skill ui-integrator
+- `threejs-dev` → skill threejs-dev
+- `tester` → skill tester
+- `reviewer` → skill reviewer
+- `stabilizer` → skill stabilizer
+
+Si un agent requis par l'US n'est **pas disponible** dans `.forge/status/` (pas de pane tmux), **fallback** : utilise `Task()` en mode Sub Agents pour cet agent uniquement.
+
+---
+
 ### 3.1 — Agents de planification (si assignés : architect, db-architect...)
 
 Utilise le skill de planification pour obtenir un plan.
