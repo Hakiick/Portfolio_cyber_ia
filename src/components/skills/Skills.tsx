@@ -23,10 +23,7 @@ function getAxisAngle(index: number): number {
   return (360 / AXIS_COUNT) * index;
 }
 
-function buildPolygonPoints(
-  levels: number[],
-  scale: number,
-): string {
+function buildPolygonPoints(levels: number[], scale: number): string {
   return levels
     .map((level, i) => {
       const angle = getAxisAngle(i);
@@ -86,9 +83,7 @@ function AxisLines({
             x2={x}
             y2={y}
             stroke={
-              isHovered
-                ? "var(--cyber-accent-green)"
-                : "var(--cyber-border)"
+              isHovered ? "var(--cyber-accent-green)" : "var(--cyber-border)"
             }
             strokeWidth={isHovered ? 2 : 1}
             opacity={isHovered ? 0.9 : 0.4}
@@ -416,7 +411,10 @@ export function Skills() {
       <div ref={sectionRef}>
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
           {/* Radar Chart */}
-          <div className="flex-shrink-0 w-full md:w-1/2" onMouseLeave={handleLeave}>
+          <div
+            className="flex-shrink-0 w-full md:w-1/2"
+            onMouseLeave={handleLeave}
+          >
             <RadarChart
               scale={scale}
               hoveredIndex={hoveredIndex}
