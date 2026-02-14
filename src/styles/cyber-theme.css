@@ -285,6 +285,17 @@ body {
   animation: border-glow 3s ease-in-out infinite;
 }
 
+/* --- Brain 3D fallback (mobile / no WebGL) --- */
+
+.brain-fallback {
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(0, 212, 255, 0.06) 0%,
+    rgba(0, 255, 65, 0.03) 40%,
+    transparent 70%
+  );
+}
+
 /* --- Selection style --- */
 
 ::selection {
