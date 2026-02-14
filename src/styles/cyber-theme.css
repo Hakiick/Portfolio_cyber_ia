@@ -103,13 +103,15 @@ body {
   opacity: 0;
 }
 
-.glitch-effect:hover::before {
+.glitch-effect:hover::before,
+.glitch-effect.is-glitching::before {
   animation: glitch-1 0.3s linear;
   color: var(--cyber-accent-blue);
   opacity: 0.8;
 }
 
-.glitch-effect:hover::after {
+.glitch-effect:hover::after,
+.glitch-effect.is-glitching::after {
   animation: glitch-2 0.3s linear;
   color: var(--cyber-accent-red);
   opacity: 0.8;
