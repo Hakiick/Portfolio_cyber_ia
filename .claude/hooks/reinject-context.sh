@@ -1,33 +1,26 @@
 #!/bin/bash
-# reinject-context.sh -- Reinject critical context after compaction
-# Used as SessionStart hook with matcher "compact"
+# reinject-context.sh — Réinjecte le contexte critique après compaction
+# Utilisé comme hook SessionStart avec matcher "compact"
 
 if [ -f "$CLAUDE_PROJECT_DIR/project.md" ]; then
-  echo "=== PROJECT CONTEXT (reinjected after compaction) ==="
+  echo "=== CONTEXTE PROJET (réinjecté après compaction) ==="
   head -50 "$CLAUDE_PROJECT_DIR/project.md"
   echo ""
-fi
-
-if [ -f "$CLAUDE_PROJECT_DIR/CLAUDE.md" ]; then
-  echo "=== ARCHITECTURE ==="
-  head -80 "$CLAUDE_PROJECT_DIR/CLAUDE.md"
+  echo "=== WORKFLOW ==="
+  echo "Rappel: Une feature à la fois. Stabiliser avant d'avancer. Utilise /next-feature pour continuer."
   echo ""
 fi
 
-echo "=== WORKFLOW ==="
-echo "Reminder: One feature at a time. Stabilize before moving on. Use /next-feature to continue."
-echo ""
-
-# Show issue state if gh is available
+# Afficher l'état des issues si gh est disponible
 if command -v gh &> /dev/null; then
-  echo "=== ISSUE STATE ==="
+  echo "=== ÉTAT DES ISSUES ==="
   IN_PROGRESS=$(gh issue list --label "in-progress" --json number,title --jq '.[] | "#\(.number) \(.title)"' 2>/dev/null)
   if [ -n "$IN_PROGRESS" ]; then
-    echo "In progress: $IN_PROGRESS"
+    echo "En cours: $IN_PROGRESS"
   fi
   REMAINING=$(gh issue list --label "task" --json number --jq 'length' 2>/dev/null)
   if [ -n "$REMAINING" ]; then
-    echo "Remaining: $REMAINING US"
+    echo "Restantes: $REMAINING US"
   fi
   echo ""
 fi

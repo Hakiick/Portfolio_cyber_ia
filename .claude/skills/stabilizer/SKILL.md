@@ -1,68 +1,55 @@
 ---
 name: stabilizer
-description: Verifies complete app stability (server start, API endpoints, build, deploy). Run this skill after each feature.
+description: Vérifie la stabilité complète de l'app (build, tests, lint, type-check). Utilise ce skill après chaque feature AVANT de passer à la suivante.
 user-invocable: true
 ---
 
-You are the stabilizer. Your role is to guarantee the app is stable.
+Tu es le stabilisateur du projet. Ton rôle est de garantir que l'app est stable.
 
-## Available scripts
-!`cat package.json 2>/dev/null | jq -r '.scripts | to_entries[] | "\(.key): \(.value)"' 2>/dev/null || echo "No package.json found"`
+## Commandes disponibles
+!`cat package.json 2>/dev/null | jq -r '.scripts | to_entries[] | "\(.key): \(.value)"' 2>/dev/null || echo "Pas de package.json"`
 
-## Stabilization procedure
+## Procédure de stabilisation
 
-Run these checks in order. If a check fails, fix it BEFORE moving to the next.
+Lance ces checks dans l'ordre. Si un check échoue, corrige-le AVANT de passer au suivant.
 
-### 1. Syntax verification
+### 1. Build
 ```bash
-# Adapt to your runtime
-node --check src/server.js 2>/dev/null || echo "Adjust path to your main file"
+npm run build
 ```
-If fails -> Read syntax errors, fix, rerun.
+Si échec → Lis les erreurs, corrige, relance.
 
-### 2. Server start
+### 2. Tests
 ```bash
-# Adapt to your start command
-timeout 10 node src/server.js &
-sleep 3
-curl -s http://localhost:3000/health || curl -s http://localhost:3000/api/stats
-kill %1 2>/dev/null
+npm test
 ```
-If fails -> Identify the startup error, fix.
+Si échec → Identifie les tests cassés. Si c'est une régression, corrige le code. Si le test est obsolète, mets-le à jour.
 
-### 3. Build (if applicable)
+### 3. Lint
 ```bash
-# Docker, npm build, etc.
-docker build -t test . 2>/dev/null || echo "No Dockerfile"
-npm run build 2>/dev/null || echo "No build script"
+npm run lint
 ```
-If fails -> Check Dockerfile, dependencies, fix.
+Si échec → Corrige les erreurs de lint. Utilise `--fix` si possible.
 
-### 4. Tests (if available)
+### 4. Type check
 ```bash
-npm test 2>/dev/null || echo "No tests configured"
+npx tsc --noEmit
 ```
-If fails -> Identify broken tests, fix code or test.
+Si échec → Corrige les erreurs de type.
 
-### 5. Deploy verification (if requested)
-```bash
-curl -sk https://your-app-url/health
-```
+## Règles
 
-## Rules
+- TOUS les checks doivent passer avant de valider
+- Si tu corriges un check, relance TOUS les checks depuis le début
+- Ne désactive jamais un test ou une règle lint pour "faire passer"
+- Documente toute correction non triviale
 
-- ALL checks must pass before validating
-- If you fix a check, rerun ALL checks from the beginning
-- Never disable a test or rule to "make it pass"
-- Document any non-trivial fix
-
-## Expected result
+## Résultat attendu
 
 ```
-Syntax:    OK
-Server:    OK (starts without error)
-Build:     OK (image/bundle built)
-Tests:     OK (X/X passed) or N/A
-Deploy:    OK (endpoint responds) or SKIP
--> STABLE
+Build:      ✓
+Tests:      ✓ (X/X passed)
+Lint:       ✓
+Type check: ✓
+→ STABLE
 ```

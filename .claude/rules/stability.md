@@ -1,18 +1,12 @@
 ---
 paths:
-  - "**/*.js"
-  - "**/*.ts"
-  - "**/*.html"
-  - "**/Dockerfile"
-  - "**/*.tf"
+  - "src/**/*.{ts,tsx,js,jsx}"
+  - "lib/**/*.{ts,tsx,js,jsx}"
 ---
 
-# Stability rules
+# Règles de stabilité
 
-- IMPORTANT: After any code modification, run /stabilizer or manually verify:
-  1. Server/app starts without error
-  2. Key API endpoints respond correctly
-  3. Build passes (Docker, CI, etc.)
-- Never disable an existing test to "make it pass"
-- Each feature must be stable BEFORE moving to the next
-- After deploy, always verify the health check endpoint
+- IMPORTANT : Après toute modification de code, lance /stabilizer ou vérifie manuellement build + tests + lint
+- Ne désactive jamais un test existant pour "faire passer" une feature
+- Ne supprime jamais une règle ESLint sans justification documentée
+- Chaque feature doit être stable AVANT de passer à la suivante
