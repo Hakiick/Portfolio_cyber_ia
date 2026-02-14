@@ -48,7 +48,7 @@ export function ClassifiedCard({
       className={cn(
         "relative cursor-pointer overflow-hidden rounded-md border transition-all duration-300",
         !isExpanded && "classified-card-hover",
-        className
+        className,
       )}
       style={{
         backgroundColor: "var(--cyber-bg-secondary)",

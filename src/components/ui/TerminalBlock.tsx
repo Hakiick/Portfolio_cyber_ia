@@ -14,10 +14,7 @@ export function TerminalBlock({
 }: TerminalBlockProps) {
   return (
     <div
-      className={cn(
-        "overflow-hidden rounded-lg border",
-        className
-      )}
+      className={cn("overflow-hidden rounded-lg border", className)}
       style={{
         borderColor: "var(--cyber-border)",
       }}

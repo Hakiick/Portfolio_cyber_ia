@@ -8,9 +8,11 @@ export interface CyberBadgeProps {
 }
 
 const variantStyles: Record<NonNullable<CyberBadgeProps["variant"]>, string> = {
-  green: "bg-[rgba(0,255,65,0.1)] text-[var(--cyber-accent-green)] border-[rgba(0,255,65,0.3)]",
+  green:
+    "bg-[rgba(0,255,65,0.1)] text-[var(--cyber-accent-green)] border-[rgba(0,255,65,0.3)]",
   blue: "bg-[rgba(0,212,255,0.1)] text-[var(--cyber-accent-blue)] border-[rgba(0,212,255,0.3)]",
-  purple: "bg-[rgba(180,74,255,0.1)] text-[var(--cyber-accent-purple)] border-[rgba(180,74,255,0.3)]",
+  purple:
+    "bg-[rgba(180,74,255,0.1)] text-[var(--cyber-accent-purple)] border-[rgba(180,74,255,0.3)]",
   red: "bg-[rgba(255,62,62,0.1)] text-[var(--cyber-accent-red)] border-[rgba(255,62,62,0.3)]",
   gray: "bg-[rgba(138,138,138,0.1)] text-[var(--cyber-text-secondary)] border-[rgba(138,138,138,0.3)]",
 };

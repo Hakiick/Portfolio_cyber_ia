@@ -1,4 +1,8 @@
-export type TimelineEntryType = "formation" | "experience" | "certification" | "pivot";
+export type TimelineEntryType =
+  | "formation"
+  | "experience"
+  | "certification"
+  | "pivot";
 
 export interface TimelineEntry {
   date: string;

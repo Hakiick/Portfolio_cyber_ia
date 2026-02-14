@@ -10,7 +10,10 @@ export interface CyberButtonProps {
   className?: string;
 }
 
-const variantStyles: Record<NonNullable<CyberButtonProps["variant"]>, string> = {
+const variantStyles: Record<
+  NonNullable<CyberButtonProps["variant"]>,
+  string
+> = {
   primary: [
     "border-[var(--cyber-accent-green)] text-[var(--cyber-accent-green)]",
     "hover:shadow-[0_0_20px_rgba(0,255,65,0.3)]",
@@ -51,7 +54,12 @@ export function CyberButton({
   href,
   className,
 }: CyberButtonProps) {
-  const classes = cn(baseStyles, variantStyles[variant], sizeStyles[size], className);
+  const classes = cn(
+    baseStyles,
+    variantStyles[variant],
+    sizeStyles[size],
+    className,
+  );
 
   if (href) {
     return (

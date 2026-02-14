@@ -1,4 +1,10 @@
-export type ProjectCategory = "ia" | "cyber" | "ia-cyber" | "cloud-iot" | "devops" | "ia-meta";
+export type ProjectCategory =
+  | "ia"
+  | "cyber"
+  | "ia-cyber"
+  | "cloud-iot"
+  | "devops"
+  | "ia-meta";
 export type ProjectStatus = "completed" | "in-progress";
 
 export interface Project {
@@ -57,7 +63,13 @@ export const projects: Project[] = [
     titre: "Domotique Cloud-Native",
     description:
       "Architecture domotique personnelle : capteurs Zigbee2MQTT, broker MQTT cloud (AWS IoT Core), analyse présence via capteurs de mouvement. Raspberry Pi + cloud.",
-    stack: ["Home Assistant", "Zigbee2MQTT", "MQTT", "AWS IoT Core", "Raspberry Pi"],
+    stack: [
+      "Home Assistant",
+      "Zigbee2MQTT",
+      "MQTT",
+      "AWS IoT Core",
+      "Raspberry Pi",
+    ],
     categorie: "cloud-iot",
     status: "in-progress",
     github: "",

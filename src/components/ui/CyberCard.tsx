@@ -8,9 +8,11 @@ export interface CyberCardProps {
 }
 
 const glowStyles: Record<NonNullable<CyberCardProps["glowColor"]>, string> = {
-  green: "hover:shadow-[0_0_20px_rgba(0,255,65,0.3)] hover:border-[var(--cyber-accent-green)]",
+  green:
+    "hover:shadow-[0_0_20px_rgba(0,255,65,0.3)] hover:border-[var(--cyber-accent-green)]",
   blue: "hover:shadow-[0_0_20px_rgba(0,212,255,0.3)] hover:border-[var(--cyber-accent-blue)]",
-  purple: "hover:shadow-[0_0_20px_rgba(180,74,255,0.3)] hover:border-[var(--cyber-accent-purple)]",
+  purple:
+    "hover:shadow-[0_0_20px_rgba(180,74,255,0.3)] hover:border-[var(--cyber-accent-purple)]",
 };
 
 const baseStyles = [
