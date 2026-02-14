@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import BootSequence from "../components/boot/BootSequence";
 import Hero from "../components/hero/Hero";
 import About from "../components/about/About";
+import Skills from "../components/skills/Skills";
 
 const title = "Hakick — AI Security Engineer | Portfolio";
 ---
@@ -12,5 +13,6 @@ const title = "Hakick — AI Security Engineer | Portfolio";
     <BootSequence client:load />
     <Hero client:load />
     <About client:load />
+    <Skills client:visible />
   </main>
 </Layout>
