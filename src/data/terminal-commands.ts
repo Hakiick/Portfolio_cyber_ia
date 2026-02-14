@@ -18,7 +18,7 @@ export const terminalCommands: TerminalCommand[] = [
       "  whoami, skills, projects, certifs, contact, cv, clear",
       "  ls, cat, pwd, uname, ping, nmap, exit",
       "  echo, date, uptime, history, neofetch",
-      "  sudo hire-me, man hire-me",
+      "  sudo hire-me, man hire-me, flags",
       "",
       "Try hacking around... there might be easter eggs ;)",
     ].join("\n"),
@@ -239,6 +239,48 @@ export const terminalCommands: TerminalCommand[] = [
     description: "SSH connection attempt",
     output:
       "Connecting to root@target... Connection refused. This isn't a real server, you know.",
+  },
+  {
+    name: "find / -name flag*",
+    description: "Search for flags",
+    output: [
+      "/home/hakick/.hidden/flag1.txt",
+      "/var/www/html/<!-- flag2 -->",
+      "/var/log/console.flag3",
+      "/etc/nginx/headers.d/flag4.conf",
+      "/root/flag5.txt",
+    ].join("\n"),
+  },
+  {
+    name: "cat /home/hakick/.hidden/flag1.txt",
+    description: "CTF Flag 1",
+    output: "FLAG{h4ck1ck_t3rm1n4l_m4st3r}",
+  },
+  {
+    name: "cat /root/flag5.txt",
+    description: "CTF Flag 5",
+    output:
+      "[RED]Permission denied.\n[RED]Just kidding.\nFLAG{r00t_4cc3ss_gr4nt3d}",
+  },
+  {
+    name: "flags",
+    description: "CTF challenge hints",
+    output: [
+      "╔═══════════════════════════════════════════╗",
+      "║         🚩 MINI-CTF CHALLENGE 🚩          ║",
+      "╠═══════════════════════════════════════════╣",
+      "║  5 flags are hidden in this portfolio.    ║",
+      "║                                           ║",
+      "║  Hints:                                   ║",
+      "║  #1 — Try exploring the filesystem...     ║",
+      "║  #2 — View the page source (Ctrl+U)       ║",
+      "║  #3 — Open your browser console (F12)      ║",
+      "║  #4 — Check the HTTP response headers      ║",
+      "║  #5 — Can you read /root?                  ║",
+      "║                                           ║",
+      "║  Found them all? You're hired.            ║",
+      "╚═══════════════════════════════════════════╝",
+    ].join("\n"),
   },
   {
     name: "echo",

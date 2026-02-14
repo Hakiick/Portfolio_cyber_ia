@@ -45,6 +45,11 @@ export function About() {
         aria-hidden="true"
       />
 
+      <span
+        className="sr-only"
+        aria-hidden="true"
+        data-ctf="5 flags are hidden in this portfolio. Type 'flags' in the terminal."
+      />
       <div className="relative z-10">
         <ScrollReveal animation="fade-in">
           <p

@@ -7,7 +7,8 @@
     "X-Frame-Options": "DENY",
     "X-XSS-Protection": "1; mode=block",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "X-CTF-Flag": "FLAG{h34d3r_hunt3r_3l1t3}"
   },
   "mimeTypes": {
     ".json": "application/json",
