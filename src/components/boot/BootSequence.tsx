@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useSoundEngine } from "../../lib/useSoundEngine";
 
 interface BootSequenceProps {
   onComplete?: () => void;
@@ -96,6 +97,7 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
   const [glitchBands, setGlitchBands] = useState<React.CSSProperties[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const completedRef = useRef(false);
+  const { play } = useSoundEngine();
 
   const totalLines = BOOT_LINES.length;
 
@@ -111,6 +113,7 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
 
     setPhase("glitching");
     setGlitchBands(getGlitchBands());
+    play("glitch");
 
     setTimeout(() => {
       setPhase("fading");
@@ -119,7 +122,7 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
         onComplete?.();
       }, FADE_DURATION_MS);
     }, GLITCH_DURATION_MS);
-  }, [onComplete]);
+  }, [onComplete, play]);
 
   // Check sessionStorage on mount and mark hydrated
   useEffect(() => {
@@ -143,6 +146,7 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
     if (visibleLines < totalLines) {
       const timer = setTimeout(() => {
         setVisibleLines((prev) => prev + 1);
+        play("boot-beep");
       }, LINE_DELAY_MS);
       return () => clearTimeout(timer);
     }
@@ -156,7 +160,7 @@ export default function BootSequence({ onComplete }: BootSequenceProps) {
 
     const timer = setTimeout(handleComplete, PAUSE_BEFORE_GLITCH_MS);
     return () => clearTimeout(timer);
-  }, [phase, visibleLines, totalLines, showWelcome, handleComplete]);
+  }, [phase, visibleLines, totalLines, showWelcome, handleComplete, play]);
 
   if (!visible) return null;
 
