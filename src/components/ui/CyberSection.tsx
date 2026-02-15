@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { cn } from "../../lib/utils";
 import type { ReactNode } from "react";
 import { DecryptText } from "./DecryptText";
@@ -22,15 +23,53 @@ const titleStyles = [
   "text-glow-green",
 ].join(" ");
 
+const PARALLAX_FACTOR = 0.15;
+
 export function CyberSection({
   id,
   title,
   children,
   className,
 }: CyberSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [offset, setOffset] = useState(0);
+  const [prefersReduced, setPrefersReduced] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReduced(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    if (prefersReduced) return;
+
+    const handleScroll = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const center = rect.top + rect.height / 2;
+      const viewCenter = window.innerHeight / 2;
+      const diff = center - viewCenter;
+      setOffset(diff * PARALLAX_FACTOR);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [prefersReduced]);
+
   return (
-    <section id={id} className={cn(sectionStyles, className)}>
-      <h2 className={titleStyles}>
+    <section ref={sectionRef} id={id} className={cn(sectionStyles, className)}>
+      <h2
+        className={titleStyles}
+        style={{
+          transform: prefersReduced ? undefined : `translateY(${offset}px)`,
+          willChange: prefersReduced ? undefined : "transform",
+        }}
+      >
         <span aria-hidden="true">&gt; </span>
         <DecryptText text={title} as="span" />
         <span
