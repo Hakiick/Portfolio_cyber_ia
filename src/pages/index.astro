@@ -17,6 +17,7 @@ import CrtOverlay from "../components/ui/CrtOverlay";
 import KonamiOverlay from "../components/ui/KonamiOverlay";
 import LiveFeed from "../components/ui/LiveFeed";
 import ScrollIndicator from "../components/ui/ScrollIndicator";
+import SectionDivider from "../components/ui/SectionDivider";
 
 const title = "Hakick — AI Security Engineer | Portfolio";
 ---
@@ -27,12 +28,19 @@ const title = "Hakick — AI Security Engineer | Portfolio";
     <BootSequence client:load />
     <Brain3D client:idle />
     <Hero client:load />
+    <SectionDivider />
     <About client:load />
+    <SectionDivider />
     <Skills client:visible />
+    <SectionDivider />
     <Projects client:visible />
+    <SectionDivider />
     <Certifications client:visible />
+    <SectionDivider />
     <Timeline client:visible />
+    <SectionDivider />
     <Terminal client:visible />
+    <SectionDivider />
     <Contact client:visible />
   </main>
   <Footer client:load />
