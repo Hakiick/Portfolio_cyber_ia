@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { LogoH } from "../ui/LogoH";
 
 interface NavSection {
   id: string;
@@ -186,16 +187,13 @@ export default function Nav() {
             background: "none",
             border: "none",
             cursor: "pointer",
-            color: "var(--cyber-accent-green)",
-            fontFamily: '"JetBrains Mono", "Fira Code", monospace',
-            fontWeight: 700,
-            fontSize: "1.5rem",
-            textShadow: "0 0 10px rgba(0, 255, 65, 0.5)",
             padding: 0,
             lineHeight: 1,
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          H
+          <LogoH size={28} />
         </button>
 
         {/* Desktop links */}
