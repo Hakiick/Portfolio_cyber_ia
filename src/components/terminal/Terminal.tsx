@@ -7,6 +7,7 @@ import { terminalCommands } from "../../data/terminal-commands";
 import type { TerminalCommand } from "../../data/terminal-commands";
 import { useAchievements, type Achievement } from "../../lib/useAchievements";
 import { chatPatterns, defaultResponse } from "../../data/chat-responses";
+import { useSoundEngine } from "../../lib/useSoundEngine";
 
 interface HistoryEntry {
   command: string;
@@ -261,6 +262,7 @@ export function Terminal() {
   const streamTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const { achievements, unlock } = useAchievements();
+  const { play } = useSoundEngine();
 
   // Auto-scroll to bottom when history changes
   useEffect(() => {
@@ -442,6 +444,7 @@ export function Terminal() {
 
       if (e.key === "Enter") {
         e.preventDefault();
+        play("command-exec");
         executeCommand(inputValue);
         setInputValue("");
         return;
@@ -485,7 +488,14 @@ export function Terminal() {
         return;
       }
     },
-    [inputValue, commandHistory, historyIndex, executeCommand, isStreaming],
+    [
+      inputValue,
+      commandHistory,
+      historyIndex,
+      executeCommand,
+      isStreaming,
+      play,
+    ],
   );
 
   const handleTerminalClick = useCallback((e: MouseEvent<HTMLDivElement>) => {
@@ -524,7 +534,10 @@ export function Terminal() {
                       ref={inputRef}
                       type="text"
                       value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
+                      onChange={(e) => {
+                        setInputValue(e.target.value);
+                        play("key-press");
+                      }}
                       onKeyDown={handleKeyDown}
                       className="w-full bg-transparent text-[var(--cyber-text-primary)] font-mono text-sm outline-none border-none p-0 caret-transparent"
                       spellCheck={false}

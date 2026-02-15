@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { LogoH } from "../ui/LogoH";
 import { useAchievements } from "../../lib/useAchievements";
 import { useLanguage } from "../../lib/useLanguage";
+import { useSoundEngine } from "../../lib/useSoundEngine";
 
 interface NavSection {
   id: string;
@@ -91,6 +92,50 @@ function LanguageToggle() {
   );
 }
 
+function SfxToggle() {
+  const { sfxEnabled, toggleSfx } = useSoundEngine();
+
+  return (
+    <button
+      onClick={toggleSfx}
+      aria-label={sfxEnabled ? "Disable sound effects" : "Enable sound effects"}
+      className="sfx-toggle"
+      style={{
+        fontFamily: '"JetBrains Mono", monospace',
+        fontSize: "0.65rem",
+        background: "none",
+        border: "1px solid var(--cyber-border)",
+        borderRadius: "2px",
+        padding: "2px 6px",
+        cursor: "pointer",
+        display: "flex",
+        gap: "4px",
+        alignItems: "center",
+        transition: "border-color 0.2s",
+        color: sfxEnabled
+          ? "var(--cyber-accent-green)"
+          : "var(--cyber-text-secondary)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = "var(--cyber-accent-green)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "var(--cyber-border)";
+      }}
+    >
+      <span>SFX</span>
+      <span
+        style={{
+          fontSize: "0.55rem",
+          opacity: 0.8,
+        }}
+      >
+        {sfxEnabled ? "ON" : "OFF"}
+      </span>
+    </button>
+  );
+}
+
 function SystemTray({ compact }: { compact?: boolean }) {
   const time = useClock();
   const { unlockedCount, totalCount } = useAchievements();
@@ -111,6 +156,7 @@ function SystemTray({ compact }: { compact?: boolean }) {
         >
           🏆 {unlockedCount}/{totalCount}
         </span>
+        <SfxToggle />
         <LanguageToggle />
         <span
           style={{
@@ -148,7 +194,9 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const prevSectionRef = useRef<string>("");
   const { t } = useLanguage();
+  const { play } = useSoundEngine();
 
   // Track scroll position for nav background
   useEffect(() => {
@@ -186,7 +234,13 @@ export default function Nav() {
         });
 
         if (topSection) {
-          setActiveSection(topSection);
+          setActiveSection((prev) => {
+            if (prev !== topSection) {
+              prevSectionRef.current = prev;
+              play("section-enter");
+            }
+            return topSection;
+          });
         }
       },
       {
