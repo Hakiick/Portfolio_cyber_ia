@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { profile } from "../../data/profile";
 import { useAchievements } from "../../lib/useAchievements";
+import { useLanguage } from "../../lib/useLanguage";
 
 const EPOCH = new Date("2025-01-01T00:00:00Z").getTime();
 
@@ -52,6 +53,7 @@ export function Footer() {
   const uptime = useUptime();
   const { unlock } = useAchievements();
   const footerRef = useRef<HTMLElement>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const footer = footerRef.current;
@@ -84,15 +86,18 @@ export function Footer() {
     >
       <div className="mx-auto max-w-5xl font-mono text-xs leading-relaxed">
         <div className="flex flex-col gap-1.5">
-          <TerminalLine command="uptime" output={uptime} />
-          <TerminalLine command="uname -v" output="HakickOS v1.0" />
+          <TerminalLine command={t("footer.uptime")} output={uptime} />
           <TerminalLine
-            command="echo $COPYRIGHT"
-            output={`© 2025 ${profile.pseudo} — All rights reserved`}
+            command={t("footer.uname")}
+            output={t("footer.uname.value")}
           />
           <TerminalLine
-            command="cat /etc/motd"
-            output="Built with multi-agent AI (9 Claude agents)"
+            command={t("footer.copyright")}
+            output={t("footer.copyright.value", { pseudo: profile.pseudo })}
+          />
+          <TerminalLine
+            command={t("footer.motd")}
+            output={t("footer.motd.value")}
             outputColor="var(--cyber-accent-purple)"
           />
           <div className="flex flex-wrap gap-x-2">
@@ -100,7 +105,7 @@ export function Footer() {
               hakick@portfolio:~$
             </span>
             <span style={{ color: "var(--cyber-text-primary)" }}>
-              open github
+              {t("footer.github")}
             </span>
             <a
               href={profile.github}

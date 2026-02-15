@@ -5,6 +5,7 @@ import { ScrollReveal } from "../ui/ScrollReveal";
 import { TypingBio } from "../ui/TypingBio";
 import { TerminalBlock } from "../ui/TerminalBlock";
 import { profile } from "../../data/profile";
+import { useLanguage } from "../../lib/useLanguage";
 
 interface Strength {
   title: string;
@@ -12,32 +13,31 @@ interface Strength {
   glowColor: "green" | "blue" | "purple";
 }
 
-const strengths: Strength[] = [
-  {
-    title: "Cloud & Infra",
-    description:
-      "Administration systèmes et réseaux, Kubernetes k0s, Docker, Proxmox VE. Monitoring avancé avec Nagios, Zabbix, Prometheus.",
-    glowColor: "blue",
-  },
-  {
-    title: "Cybersécurité",
-    description:
-      "Certifié eJPTv2, CTF, sécurité applicative. Spécialisation LLM Security : prompt injection, jailbreaks, OWASP Top 10 for LLM.",
-    glowColor: "green",
-  },
-  {
-    title: "IA Générative",
-    description:
-      "Computer Vision (YOLOv8), agents IA automatisés (n8n), intégration LLM en entreprise. Dataset building et guardrails.",
-    glowColor: "purple",
-  },
-  {
-    title: "Tech Lead",
-    description:
-      "Gestion d'équipe technique, environnements critiques, backup et supervision. Pipelines CI/CD GitLab complètes.",
-    glowColor: "green",
-  },
-];
+function useStrengths() {
+  const { t } = useLanguage();
+  return [
+    {
+      title: t("about.strength.cloud.title"),
+      description: t("about.strength.cloud.desc"),
+      glowColor: "blue" as const,
+    },
+    {
+      title: t("about.strength.cyber.title"),
+      description: t("about.strength.cyber.desc"),
+      glowColor: "green" as const,
+    },
+    {
+      title: t("about.strength.ai.title"),
+      description: t("about.strength.ai.desc"),
+      glowColor: "purple" as const,
+    },
+    {
+      title: t("about.strength.lead.title"),
+      description: t("about.strength.lead.desc"),
+      glowColor: "green" as const,
+    },
+  ];
+}
 
 const ASCII_H = `██╗  ██╗
 ██║  ██║
@@ -46,49 +46,57 @@ const ASCII_H = `██╗  ██╗
 ██║  ██║
 ╚═╝  ╚═╝`;
 
-const NEOFETCH_LINES = [
-  { label: "OS", value: "HakickOS v1.0", color: "var(--cyber-accent-green)" },
-  {
-    label: "Host",
-    value: profile.pseudo,
-    color: "var(--cyber-accent-green)",
-  },
-  {
-    label: "Role",
-    value: "AI Security Engineer",
-    color: "var(--cyber-accent-blue)",
-  },
-  {
-    label: "School",
-    value: "Epitech (5th year)",
-    color: "var(--cyber-text-primary)",
-  },
-  {
-    label: "Stack",
-    value: "Cloud · Cyber · GenAI",
-    color: "var(--cyber-accent-purple)",
-  },
-  {
-    label: "Certs",
-    value: "eJPTv2, AZ-900, AWS",
-    color: "var(--cyber-text-primary)",
-  },
-  {
-    label: "Shell",
-    value: "zsh + tmux",
-    color: "var(--cyber-text-primary)",
-  },
-  {
-    label: "Editor",
-    value: "Neovim + Claude Code",
-    color: "var(--cyber-text-primary)",
-  },
-];
+function useNeofetchLines() {
+  const { t } = useLanguage();
+  return [
+    {
+      label: t("about.neofetch.os"),
+      value: "HakickOS v1.0",
+      color: "var(--cyber-accent-green)",
+    },
+    {
+      label: t("about.neofetch.host"),
+      value: profile.pseudo,
+      color: "var(--cyber-accent-green)",
+    },
+    {
+      label: t("about.neofetch.role"),
+      value: t("about.neofetch.role.value"),
+      color: "var(--cyber-accent-blue)",
+    },
+    {
+      label: t("about.neofetch.school"),
+      value: t("about.neofetch.school.value"),
+      color: "var(--cyber-text-primary)",
+    },
+    {
+      label: t("about.neofetch.stack"),
+      value: t("about.neofetch.stack.value"),
+      color: "var(--cyber-accent-purple)",
+    },
+    {
+      label: t("about.neofetch.certs"),
+      value: t("about.neofetch.certs.value"),
+      color: "var(--cyber-text-primary)",
+    },
+    {
+      label: t("about.neofetch.shell"),
+      value: t("about.neofetch.shell.value"),
+      color: "var(--cyber-text-primary)",
+    },
+    {
+      label: t("about.neofetch.editor"),
+      value: t("about.neofetch.editor.value"),
+      color: "var(--cyber-text-primary)",
+    },
+  ];
+}
 
 function Neofetch() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [visibleLines, setVisibleLines] = useState(0);
   const [started, setStarted] = useState(false);
+  const NEOFETCH_LINES = useNeofetchLines();
 
   useEffect(() => {
     const el = containerRef.current;
@@ -188,8 +196,12 @@ function Neofetch() {
 }
 
 export function About() {
+  const { lang } = useLanguage();
+  const strengths = useStrengths();
+  const bio = lang === "en" && profile.bioEn ? profile.bioEn : profile.bio;
+
   return (
-    <CyberSection id="about" title="about_me" className="relative">
+    <CyberSection id="about" title="section.about" className="relative">
       <div
         id="brain-container-about"
         className="absolute inset-0 z-0 opacity-30 pointer-events-none"
@@ -203,7 +215,7 @@ export function About() {
       />
       <div className="relative z-10">
         <TypingBio
-          text={profile.bio}
+          text={bio}
           className="text-base md:text-lg leading-relaxed max-w-3xl mb-10 md:mb-14"
           style={{ color: "var(--cyber-text-primary)" }}
         />

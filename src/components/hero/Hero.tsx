@@ -3,6 +3,7 @@ import { GlitchText } from "../ui/GlitchText";
 import { CyberButton } from "../ui/CyberButton";
 import { profile } from "../../data/profile";
 import { useAchievements } from "../../lib/useAchievements";
+import { useLanguage } from "../../lib/useLanguage";
 
 const ASCII_HAKICK = `██╗  ██╗ █████╗ ██╗  ██╗██╗ ██████╗██╗  ██╗
 ██║  ██║██╔══██╗██║ ██╔╝██║██╔════╝██║ ██╔╝
@@ -59,6 +60,7 @@ export function Hero() {
   const [isTablet, setIsTablet] = useState(false);
   const [startTyping, setStartTyping] = useState(false);
   const { unlock } = useAchievements();
+  const { lang } = useLanguage();
 
   useEffect(() => {
     const w = window.innerWidth;
@@ -134,26 +136,30 @@ export function Hero() {
           className="mt-4 text-lg md:text-xl lg:text-2xl font-medium"
           style={{ color: "var(--cyber-text-primary)" }}
         >
-          {profile.titre}
+          {lang === "en" && profile.titreEn ? profile.titreEn : profile.titre}
         </p>
 
         <p
           className="mt-2 text-sm md:text-base font-mono tracking-wider"
           style={{ color: "var(--cyber-accent-blue)" }}
         >
-          {profile.sousTitre}
+          {lang === "en" && profile.sousTitreEn
+            ? profile.sousTitreEn
+            : profile.sousTitre}
         </p>
 
         <p
           className="mt-6 text-sm md:text-base max-w-xl mx-auto leading-relaxed"
           style={{ color: "var(--cyber-text-secondary)" }}
         >
-          {getShortBio(profile.bio)}
+          {getShortBio(
+            lang === "en" && profile.bioEn ? profile.bioEn : profile.bio,
+          )}
         </p>
 
         <div className="mt-8">
           <CyberButton variant="primary" size="lg" href="#about">
-            Explore my profile
+            {lang === "en" ? "Explore my profile" : "Explorer mon profil"}
           </CyberButton>
         </div>
       </div>

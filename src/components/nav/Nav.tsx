@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { LogoH } from "../ui/LogoH";
 import { useAchievements } from "../../lib/useAchievements";
+import { useLanguage } from "../../lib/useLanguage";
 
 interface NavSection {
   id: string;
@@ -8,13 +9,13 @@ interface NavSection {
 }
 
 const NAV_SECTIONS: NavSection[] = [
-  { id: "about", label: "About" },
-  { id: "skills", label: "Skills" },
-  { id: "projects", label: "Projects" },
-  { id: "certifications", label: "Certs" },
-  { id: "timeline", label: "Timeline" },
-  { id: "terminal", label: "Terminal" },
-  { id: "contact", label: "Contact" },
+  { id: "about", label: "nav.about" },
+  { id: "skills", label: "nav.skills" },
+  { id: "projects", label: "nav.projects" },
+  { id: "certifications", label: "nav.certifications" },
+  { id: "timeline", label: "nav.timeline" },
+  { id: "terminal", label: "nav.terminal" },
+  { id: "contact", label: "nav.contact" },
 ];
 
 function useClock() {
@@ -33,6 +34,61 @@ function useClock() {
   }, []);
 
   return time;
+}
+
+function LanguageToggle() {
+  const { lang, toggle } = useLanguage();
+
+  return (
+    <button
+      onClick={toggle}
+      aria-label="Toggle language"
+      className="language-toggle"
+      style={{
+        fontFamily: '"JetBrains Mono", monospace',
+        fontSize: "0.65rem",
+        background: "none",
+        border: "1px solid var(--cyber-border)",
+        borderRadius: "2px",
+        padding: "2px 6px",
+        cursor: "pointer",
+        display: "flex",
+        gap: "4px",
+        alignItems: "center",
+        transition: "border-color 0.2s",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = "var(--cyber-accent-green)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "var(--cyber-border)";
+      }}
+    >
+      <span
+        style={{
+          color:
+            lang === "fr"
+              ? "var(--cyber-accent-green)"
+              : "var(--cyber-text-secondary)",
+          fontWeight: lang === "fr" ? "bold" : "normal",
+        }}
+      >
+        FR
+      </span>
+      <span style={{ color: "var(--cyber-border)" }}>|</span>
+      <span
+        style={{
+          color:
+            lang === "en"
+              ? "var(--cyber-accent-green)"
+              : "var(--cyber-text-secondary)",
+          fontWeight: lang === "en" ? "bold" : "normal",
+        }}
+      >
+        EN
+      </span>
+    </button>
+  );
 }
 
 function SystemTray({ compact }: { compact?: boolean }) {
@@ -55,6 +111,7 @@ function SystemTray({ compact }: { compact?: boolean }) {
         >
           🏆 {unlockedCount}/{totalCount}
         </span>
+        <LanguageToggle />
         <span
           style={{
             fontFamily: '"JetBrains Mono", monospace',
@@ -91,6 +148,7 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const { t } = useLanguage();
 
   // Track scroll position for nav background
   useEffect(() => {
@@ -224,7 +282,7 @@ export default function Nav() {
             <button
               key={id}
               onClick={() => scrollToSection(id)}
-              aria-label={`Scroll to ${label}`}
+              aria-label={`Scroll to ${t(label)}`}
               style={{
                 background: "none",
                 border: "none",
@@ -255,7 +313,7 @@ export default function Nav() {
                 }
               }}
             >
-              {label}
+              {t(label)}
             </button>
           ))}
         </div>
@@ -367,7 +425,7 @@ export default function Nav() {
                   : "none",
             }}
           >
-            {label}
+            {t(label)}
           </button>
         ))}
 

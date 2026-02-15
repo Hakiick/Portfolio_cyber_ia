@@ -4,6 +4,7 @@ import { CyberSection } from "../ui/CyberSection";
 import { TerminalBlock } from "../ui/TerminalBlock";
 import { ScrollReveal } from "../ui/ScrollReveal";
 import { profile } from "../../data/profile";
+import { useLanguage } from "../../lib/useLanguage";
 
 const inputBaseStyles = [
   "w-full bg-transparent font-mono text-sm",
@@ -28,6 +29,7 @@ const HEX_CHARS = "0123456789ABCDEF";
 const BIN_CHARS = "01";
 
 function TransmissionOverlay({ phase }: { phase: TransmitPhase }) {
+  const { t } = useLanguage();
   const [chars, setChars] = useState<
     Array<{ char: string; x: number; y: number; speed: number; id: number }>
   >([]);
@@ -60,10 +62,10 @@ function TransmissionOverlay({ phase }: { phase: TransmitPhase }) {
 
   const statusText =
     phase === "encrypting"
-      ? "Encrypting..."
+      ? t("contact.status.encrypting")
       : phase === "transmitting"
-        ? "Transmitting..."
-        : "Sent ✓";
+        ? t("contact.status.transmitting")
+        : t("contact.status.sent");
 
   const statusColor =
     phase === "sent" ? "var(--cyber-accent-green)" : "var(--cyber-accent-blue)";
@@ -123,6 +125,7 @@ function ContactForm() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [phase, setPhase] = useState<TransmitPhase>("idle");
+  const { t } = useLanguage();
 
   const handleSubmit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
@@ -157,7 +160,7 @@ function ContactForm() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
           <label htmlFor="contact-name" className={labelStyles}>
-            &gt; nom_
+            {t("contact.label.name")}
             <span
               className="inline-block w-[2px] h-3 ml-0.5 align-middle"
               style={{
@@ -170,7 +173,7 @@ function ContactForm() {
             id="contact-name"
             type="text"
             required
-            placeholder="Votre nom"
+            placeholder={t("contact.placeholder.name")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className={inputBaseStyles}
@@ -180,7 +183,7 @@ function ContactForm() {
 
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
           <label htmlFor="contact-email" className={labelStyles}>
-            &gt; email_
+            {t("contact.label.email")}
             <span
               className="inline-block w-[2px] h-3 ml-0.5 align-middle"
               style={{
@@ -194,7 +197,7 @@ function ContactForm() {
             id="contact-email"
             type="email"
             required
-            placeholder="votre@email.com"
+            placeholder={t("contact.placeholder.email")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={inputBaseStyles}
@@ -204,7 +207,7 @@ function ContactForm() {
 
         <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
           <label htmlFor="contact-message" className={labelStyles}>
-            &gt; message_
+            {t("contact.label.message")}
             <span
               className="inline-block w-[2px] h-3 ml-0.5 align-middle"
               style={{
@@ -217,7 +220,7 @@ function ContactForm() {
           <textarea
             id="contact-message"
             required
-            placeholder="Votre message..."
+            placeholder={t("contact.placeholder.message")}
             rows={4}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -232,7 +235,7 @@ function ContactForm() {
             disabled={phase !== "idle"}
             className="contact-submit-btn relative inline-flex items-center justify-center overflow-hidden border border-[var(--cyber-accent-green)] bg-transparent px-6 py-2.5 font-mono text-sm font-medium text-[var(--cyber-accent-green)] transition-all duration-200 hover:shadow-[0_0_20px_rgba(0,255,65,0.3)] active:scale-[0.97] disabled:opacity-50"
           >
-            [ ENVOYER ]
+            {t("contact.button.send")}
           </button>
         </div>
       </form>
@@ -271,8 +274,10 @@ function ContactForm() {
 }
 
 export function Contact() {
+  const { t } = useLanguage();
+
   return (
-    <CyberSection id="contact" title="contact_">
+    <CyberSection id="contact" title="section.contact">
       <div className="mx-auto max-w-2xl">
         <ScrollReveal animation="fade-in">
           <TerminalBlock title="contact.sh">
@@ -284,7 +289,7 @@ export function Contact() {
           <div className="mt-6 flex flex-col items-center gap-2 font-mono text-sm">
             <a
               href={`mailto:${profile.email}`}
-              aria-label="Envoyer un email"
+              aria-label={t("contact.email.label")}
               className="text-[var(--cyber-text-secondary)] transition-colors duration-200 hover:text-[var(--cyber-accent-green)]"
             >
               {profile.email}
@@ -293,7 +298,7 @@ export function Contact() {
               href={profile.github}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Profil GitHub"
+              aria-label={t("contact.github.label")}
               className="text-[var(--cyber-text-secondary)] transition-colors duration-200 hover:text-[var(--cyber-accent-blue)]"
             >
               github.com/{profile.pseudo.toLowerCase()}
