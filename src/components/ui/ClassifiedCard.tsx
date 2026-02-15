@@ -1,5 +1,7 @@
+import { useState, useEffect, useRef } from "react";
 import type { Project } from "../../data/projects";
 import { cn } from "../../lib/utils";
+import { DecryptText } from "./DecryptText";
 
 export interface ClassifiedCardProps {
   project: Project;
@@ -24,6 +26,8 @@ const STATUS_CONFIG: Record<
   },
 };
 
+type DeclassifyPhase = "idle" | "declassifying" | "declassified" | "done";
+
 export function ClassifiedCard({
   project,
   index,
@@ -33,6 +37,30 @@ export function ClassifiedCard({
 }: ClassifiedCardProps) {
   const dossierNumber = `DOSSIER-${padIndex(index)}`;
   const statusInfo = STATUS_CONFIG[project.status];
+  const [phase, setPhase] = useState<DeclassifyPhase>("idle");
+  const [isHovered, setIsHovered] = useState(false);
+  const wasExpanded = useRef(false);
+
+  useEffect(() => {
+    if (isExpanded && !wasExpanded.current) {
+      setPhase("declassifying");
+      const t1 = setTimeout(() => setPhase("declassified"), 400);
+      const t2 = setTimeout(() => setPhase("done"), 1200);
+      wasExpanded.current = true;
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+    if (!isExpanded) {
+      wasExpanded.current = false;
+      setPhase("idle");
+    }
+  }, [isExpanded]);
+
+  const showClassified = !isExpanded && phase === "idle";
+  const showDeclassifying = phase === "declassifying";
+  const showDeclassified = phase === "declassified";
 
   return (
     <div
@@ -47,6 +75,8 @@ export function ClassifiedCard({
           onToggle();
         }
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={cn(
         "relative cursor-pointer overflow-hidden rounded-md border transition-all duration-300",
         !isExpanded && "classified-card-hover",
@@ -54,13 +84,18 @@ export function ClassifiedCard({
       )}
       style={{
         backgroundColor: "var(--cyber-bg-secondary)",
-        borderColor: "var(--cyber-border)",
+        borderColor: isExpanded
+          ? "var(--cyber-accent-green)"
+          : "var(--cyber-border)",
         borderLeftWidth: "4px",
-        borderLeftColor: "var(--cyber-accent-red)",
+        borderLeftColor: isExpanded
+          ? "var(--cyber-accent-green)"
+          : "var(--cyber-accent-red)",
+        boxShadow: isExpanded ? "0 0 15px rgba(0,255,65,0.1)" : "none",
       }}
     >
-      {/* CLASSIFIED stamp - only when collapsed */}
-      {!isExpanded && (
+      {/* CLASSIFIED stamp - collapsed */}
+      {showClassified && (
         <div
           className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden"
           aria-hidden="true"
@@ -78,6 +113,43 @@ export function ClassifiedCard({
         </div>
       )}
 
+      {/* CLASSIFIED stamp - declassifying (rotate + fade out) */}
+      {showDeclassifying && (
+        <div
+          className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden"
+          aria-hidden="true"
+        >
+          <span
+            className="select-none whitespace-nowrap font-mono text-4xl font-bold uppercase tracking-widest sm:text-5xl"
+            style={{
+              color: "var(--cyber-accent-red)",
+              animation: "stamp-fade-out 0.4s ease-out forwards",
+            }}
+          >
+            CLASSIFIED
+          </span>
+        </div>
+      )}
+
+      {/* DECLASSIFIED stamp - brief flash */}
+      {showDeclassified && (
+        <div
+          className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden"
+          aria-hidden="true"
+        >
+          <span
+            className="select-none whitespace-nowrap font-mono text-4xl font-bold uppercase tracking-widest sm:text-5xl"
+            style={{
+              color: "var(--cyber-accent-green)",
+              animation: "stamp-flash-in 0.8s ease-out forwards",
+              textShadow: "0 0 20px rgba(0,255,65,0.5)",
+            }}
+          >
+            DECLASSIFIED
+          </span>
+        </div>
+      )}
+
       {/* Card content */}
       <div className="relative z-10 p-4 sm:p-6">
         {/* Dossier number */}
@@ -85,7 +157,11 @@ export function ClassifiedCard({
           className="mb-2 block font-mono text-xs"
           style={{ color: "var(--cyber-text-secondary)" }}
         >
-          {dossierNumber}
+          {isHovered && !isExpanded ? (
+            <DecryptText text={dossierNumber} as="span" />
+          ) : (
+            dossierNumber
+          )}
         </span>
 
         {/* Title */}
@@ -160,7 +236,7 @@ export function ClassifiedCard({
         </div>
       </div>
 
-      {/* Inline styles for hover animations */}
+      {/* Inline styles for animations */}
       <style>{`
         .classified-card-hover:hover {
           animation: card-shake 0.3s ease-in-out;
@@ -174,6 +250,15 @@ export function ClassifiedCard({
           40% { transform: translateX(2px); }
           60% { transform: translateX(-1px); }
           80% { transform: translateX(1px); }
+        }
+        @keyframes stamp-fade-out {
+          0% { opacity: 0.15; transform: rotate(-30deg) scale(1); }
+          100% { opacity: 0; transform: rotate(-15deg) scale(1.2); }
+        }
+        @keyframes stamp-flash-in {
+          0% { opacity: 0; transform: rotate(-30deg) scale(0.8); }
+          30% { opacity: 0.3; transform: rotate(-25deg) scale(1.05); }
+          100% { opacity: 0; transform: rotate(-25deg) scale(1.1); }
         }
       `}</style>
     </div>
