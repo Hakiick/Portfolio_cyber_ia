@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { LogoH } from "../ui/LogoH";
+import { useAchievements } from "../../lib/useAchievements";
 
 interface NavSection {
   id: string;
@@ -36,10 +37,24 @@ function useClock() {
 
 function SystemTray({ compact }: { compact?: boolean }) {
   const time = useClock();
+  const { unlockedCount, totalCount } = useAchievements();
 
   const items = useMemo(
     () => (
       <>
+        <span
+          style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: compact ? "0.65rem" : "0.6rem",
+            color: "var(--cyber-accent-green)",
+            padding: "2px 6px",
+            border: "1px solid var(--cyber-accent-green)",
+            borderRadius: "2px",
+            opacity: 0.8,
+          }}
+        >
+          🏆 {unlockedCount}/{totalCount}
+        </span>
         <span
           style={{
             fontFamily: '"JetBrains Mono", monospace',
@@ -65,7 +80,7 @@ function SystemTray({ compact }: { compact?: boolean }) {
         </span>
       </>
     ),
-    [time, compact],
+    [time, compact, unlockedCount, totalCount],
   );
 
   return items;

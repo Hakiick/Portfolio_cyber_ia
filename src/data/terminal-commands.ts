@@ -18,7 +18,7 @@ export const terminalCommands: TerminalCommand[] = [
       "  whoami, skills, projects, certifs, contact, cv, clear",
       "  ls, cat, pwd, uname, ping, nmap, exit",
       "  echo, date, uptime, history, neofetch",
-      "  sudo hire-me, man hire-me, flags",
+      "  sudo hire-me, man hire-me, flags, achievements",
       "",
       "Try hacking around... there might be easter eggs ;)",
     ].join("\n"),
@@ -281,6 +281,11 @@ export const terminalCommands: TerminalCommand[] = [
       "║  Found them all? You're hired.            ║",
       "╚═══════════════════════════════════════════╝",
     ].join("\n"),
+  },
+  {
+    name: "achievements",
+    description: "Show unlocked achievements",
+    output: "__ACHIEVEMENTS__",
   },
   {
     name: "echo",

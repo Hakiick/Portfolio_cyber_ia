@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { GlitchText } from "../ui/GlitchText";
 import { CyberButton } from "../ui/CyberButton";
 import { profile } from "../../data/profile";
+import { useAchievements } from "../../lib/useAchievements";
 
 const ASCII_HAKICK = `██╗  ██╗ █████╗ ██╗  ██╗██╗ ██████╗██╗  ██╗
 ██║  ██║██╔══██╗██║ ██╔╝██║██╔════╝██║ ██╔╝
@@ -57,6 +58,7 @@ export function Hero() {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [startTyping, setStartTyping] = useState(false);
+  const { unlock } = useAchievements();
 
   useEffect(() => {
     const w = window.innerWidth;
@@ -76,6 +78,11 @@ export function Hero() {
     const timer = setTimeout(() => setStartTyping(true), 300);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => unlock("first-visit"), 1500);
+    return () => clearTimeout(timer);
+  }, [unlock]);
 
   const asciiText = isMobile ? ASCII_H : ASCII_HAKICK;
   const { displayed, done } = useTypewriter(
