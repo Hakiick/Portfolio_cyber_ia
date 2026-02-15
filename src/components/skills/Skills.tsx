@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { CyberSection } from "../ui/CyberSection";
 import { ScrollReveal } from "../ui/ScrollReveal";
+import { SkillTree } from "./SkillTree";
 import { skills, type SkillCategory } from "../../data/skills";
 import { useLanguage } from "../../lib/useLanguage";
 
@@ -456,11 +457,15 @@ function SkillCategoryButtons({
   );
 }
 
+type SkillView = "radar" | "tree";
+
 export function Skills() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [scale, setScale] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [view, setView] = useState<SkillView>("radar");
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { lang } = useLanguage();
 
   const handleHover = useCallback((index: number) => {
     setHoveredIndex(index);
@@ -514,52 +519,100 @@ export function Skills() {
   return (
     <CyberSection id="skills" title="section.skills">
       <div ref={sectionRef}>
-        <ScrollReveal animation="fade-in">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
-            {/* Radar Chart */}
-            <div
-              className="flex-shrink-0 w-full md:w-1/2"
-              onMouseLeave={handleLeave}
+        {/* View Toggle */}
+        <div className="flex justify-center mb-6">
+          <div
+            className="inline-flex rounded border font-mono text-xs"
+            style={{ borderColor: "var(--cyber-border)" }}
+          >
+            <button
+              onClick={() => setView("radar")}
+              className="px-3 py-1.5 transition-colors duration-200"
+              style={{
+                backgroundColor:
+                  view === "radar"
+                    ? "rgba(0,255,65,0.1)"
+                    : "var(--cyber-bg-secondary)",
+                color:
+                  view === "radar"
+                    ? "var(--cyber-accent-green)"
+                    : "var(--cyber-text-secondary)",
+                borderRight: "1px solid var(--cyber-border)",
+              }}
             >
-              <RadarChart
-                scale={scale}
-                hoveredIndex={hoveredIndex}
-                onHover={handleHover}
-                onLeave={handleLeave}
-              />
-              <SkillCategoryButtons
-                hoveredIndex={hoveredIndex}
-                onSelect={handleMobileSelect}
-              />
-            </div>
-
-            {/* Detail Panel */}
-            <div className="w-full md:w-1/2 min-h-[200px]">
-              {activeCategory ? (
-                <SkillDetailPanel category={activeCategory} />
-              ) : (
-                <div
-                  className="flex items-center justify-center h-full min-h-[200px] rounded-md border border-dashed p-6"
-                  style={{
-                    borderColor: "var(--cyber-border)",
-                    color: "var(--cyber-text-secondary)",
-                  }}
-                >
-                  <p className="font-mono text-sm text-center">
-                    <span
-                      className="block mb-2 text-base"
-                      style={{ color: "var(--cyber-accent-green)" }}
-                    >
-                      [ ]
-                    </span>
-                    Survolez un axe du radar
-                    <br />
-                    pour voir le detail
-                  </p>
-                </div>
-              )}
-            </div>
+              {lang === "en" ? "Radar" : "Radar"}
+            </button>
+            <button
+              onClick={() => setView("tree")}
+              className="px-3 py-1.5 transition-colors duration-200"
+              style={{
+                backgroundColor:
+                  view === "tree"
+                    ? "rgba(0,255,65,0.1)"
+                    : "var(--cyber-bg-secondary)",
+                color:
+                  view === "tree"
+                    ? "var(--cyber-accent-green)"
+                    : "var(--cyber-text-secondary)",
+              }}
+            >
+              {lang === "en" ? "Skill Tree" : "Skill Tree"}
+            </button>
           </div>
+        </div>
+
+        <ScrollReveal animation="fade-in">
+          {view === "radar" ? (
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
+              {/* Radar Chart */}
+              <div
+                className="flex-shrink-0 w-full md:w-1/2"
+                onMouseLeave={handleLeave}
+              >
+                <RadarChart
+                  scale={scale}
+                  hoveredIndex={hoveredIndex}
+                  onHover={handleHover}
+                  onLeave={handleLeave}
+                />
+                <SkillCategoryButtons
+                  hoveredIndex={hoveredIndex}
+                  onSelect={handleMobileSelect}
+                />
+              </div>
+
+              {/* Detail Panel */}
+              <div className="w-full md:w-1/2 min-h-[200px]">
+                {activeCategory ? (
+                  <SkillDetailPanel category={activeCategory} />
+                ) : (
+                  <div
+                    className="flex items-center justify-center h-full min-h-[200px] rounded-md border border-dashed p-6"
+                    style={{
+                      borderColor: "var(--cyber-border)",
+                      color: "var(--cyber-text-secondary)",
+                    }}
+                  >
+                    <p className="font-mono text-sm text-center">
+                      <span
+                        className="block mb-2 text-base"
+                        style={{ color: "var(--cyber-accent-green)" }}
+                      >
+                        [ ]
+                      </span>
+                      {lang === "en"
+                        ? "Hover an axis to see details"
+                        : "Survolez un axe du radar"}
+                      <br />
+                      {lang === "en" ? "" : "pour voir le detail"}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <SkillTree />
+          )}
         </ScrollReveal>
       </div>
     </CyberSection>
