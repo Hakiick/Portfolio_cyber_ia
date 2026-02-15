@@ -6,6 +6,7 @@ import { MatrixRain } from "../ui/MatrixRain";
 import { terminalCommands } from "../../data/terminal-commands";
 import type { TerminalCommand } from "../../data/terminal-commands";
 import { useAchievements, type Achievement } from "../../lib/useAchievements";
+import { chatPatterns, defaultResponse } from "../../data/chat-responses";
 
 interface HistoryEntry {
   command: string;
@@ -13,7 +14,7 @@ interface HistoryEntry {
   isStreaming?: boolean;
 }
 
-type TagColor = "green" | "blue" | "red" | "default";
+type TagColor = "green" | "blue" | "red" | "purple" | "default";
 
 interface ColoredSegment {
   text: string;
@@ -30,6 +31,7 @@ const TAG_COLORS: Record<string, TagColor> = {
   "[READY]": "green",
   "[SCAN]": "blue",
   "[INFO]": "blue",
+  "[AI]": "purple",
   "[VULN]": "red",
   "[EXPLOIT]": "red",
   "[RED]": "red",
@@ -39,6 +41,7 @@ const TAG_COLORS: Record<string, TagColor> = {
 const COLOR_CSS: Record<TagColor, string> = {
   green: "var(--cyber-accent-green)",
   blue: "var(--cyber-accent-blue)",
+  purple: "var(--cyber-accent-purple)",
   red: "var(--cyber-accent-red)",
   default: "var(--cyber-text-secondary)",
 };
@@ -62,6 +65,15 @@ function parseColoredLine(line: string): ColoredSegment[] {
   }
 
   return [{ text: line, color: "default" }];
+}
+
+function findChatResponse(message: string): string {
+  for (const entry of chatPatterns) {
+    if (entry.patterns.some((p) => p.test(message))) {
+      return entry.response;
+    }
+  }
+  return defaultResponse;
 }
 
 function isStreamingOutput(output: string): boolean {
@@ -362,6 +374,40 @@ export function Terminal() {
         ]);
         setCommandHistory((prev) => [...prev, trimmed]);
         setHistoryIndex(-1);
+        return;
+      }
+
+      // Handle AI chat with thinking delay
+      if (output.startsWith("__CHAT__")) {
+        const message = output.slice(8);
+        const response = findChatResponse(message);
+        setIsStreaming(true);
+        setHistory((prev) => [
+          ...prev,
+          { command: trimmed, output: "[AI] Thinking...", isStreaming: true },
+        ]);
+        setCommandHistory((prev) => [...prev, trimmed]);
+        setHistoryIndex(-1);
+
+        const timer = setTimeout(
+          () => {
+            setHistory((prev) => {
+              const updated = [...prev];
+              const last = updated[updated.length - 1];
+              if (last && last.isStreaming) {
+                updated[updated.length - 1] = {
+                  ...last,
+                  output: "[AI] " + response,
+                  isStreaming: false,
+                };
+              }
+              return updated;
+            });
+            setIsStreaming(false);
+          },
+          800 + Math.random() * 600,
+        );
+        streamTimersRef.current.push(timer);
         return;
       }
 

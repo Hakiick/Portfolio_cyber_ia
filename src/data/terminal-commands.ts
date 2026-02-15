@@ -18,7 +18,8 @@ export const terminalCommands: TerminalCommand[] = [
       "  whoami, skills, projects, certifs, contact, cv, clear",
       "  ls, cat, pwd, uname, ping, nmap, exit",
       "  echo, date, uptime, history, neofetch",
-      "  sudo hire-me, man hire-me, flags, achievements",
+      "  chat <message>, achievements",
+      "  sudo hire-me, man hire-me, flags",
       "",
       "Try hacking around... there might be easter eggs ;)",
     ].join("\n"),
@@ -307,6 +308,15 @@ export const terminalCommands: TerminalCommand[] = [
     name: "date",
     description: "Display current date",
     output: (): string => new Date().toString(),
+  },
+  {
+    name: "chat",
+    description: "Chat with AI assistant",
+    output: (args: string[]): string => {
+      if (args.length === 0)
+        return "[AI] Usage : chat <message>\nExemple : chat qui es-tu ?";
+      return "__CHAT__" + args.join(" ");
+    },
   },
   {
     name: "uptime",
