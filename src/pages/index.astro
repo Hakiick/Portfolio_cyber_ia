@@ -19,6 +19,7 @@ import LiveFeed from "../components/ui/LiveFeed";
 import ScrollIndicator from "../components/ui/ScrollIndicator";
 import SectionDivider from "../components/ui/SectionDivider";
 import AchievementToast from "../components/ui/AchievementToast";
+import CodeRain from "../components/ui/CodeRain";
 
 const title = "Hakick — AI Security Engineer | Portfolio";
 ---
@@ -34,13 +35,16 @@ const title = "Hakick — AI Security Engineer | Portfolio";
     <SectionDivider />
     <Skills client:visible />
     <SectionDivider />
-    <Projects client:visible />
-    <SectionDivider />
-    <Certifications client:visible />
-    <SectionDivider />
-    <Timeline client:visible />
-    <SectionDivider />
-    <Terminal client:visible />
+    <div class="relative">
+      <CodeRain client:idle />
+      <Projects client:visible />
+      <SectionDivider />
+      <Certifications client:visible />
+      <SectionDivider />
+      <Timeline client:visible />
+      <SectionDivider />
+      <Terminal client:visible />
+    </div>
     <SectionDivider />
     <Contact client:visible />
   </main>
