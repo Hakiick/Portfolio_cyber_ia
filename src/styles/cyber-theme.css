@@ -46,6 +46,15 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
+}
+
+/* Reduce CLS: reserve space for custom fonts */
+.font-mono,
+code,
+pre {
+  font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  font-display: swap;
 }
 
 /* --- Utility classes --- */

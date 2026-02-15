@@ -8,4 +8,24 @@ export default defineConfig({
   integrations: [react(), tailwind({
     applyBaseStyles: false,
   }),],
+  vite: {
+    build: {
+      chunkSizeWarningLimit: 750,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules/three/")) {
+              return "three-core";
+            }
+            if (id.includes("node_modules/postprocessing/") || id.includes("node_modules/@react-three/postprocessing/")) {
+              return "three-postprocessing";
+            }
+            if (id.includes("node_modules/@react-three/")) {
+              return "three-ecosystem";
+            }
+          },
+        },
+      },
+    },
+  },
 });

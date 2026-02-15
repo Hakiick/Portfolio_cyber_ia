@@ -106,9 +106,19 @@ function AxisLines({
             stroke="transparent"
             strokeWidth={24}
             className="cursor-pointer"
+            role="button"
+            tabIndex={0}
+            aria-label={`Compétence : ${skills[i].label}`}
             onMouseEnter={() => onHover(i)}
             onMouseLeave={onLeave}
             onClick={() => onHover(i)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onHover(i);
+              }
+            }}
+            onBlur={onLeave}
           />
         );
       })}
