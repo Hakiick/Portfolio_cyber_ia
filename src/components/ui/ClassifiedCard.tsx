@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { Project } from "../../data/projects";
 import { cn } from "../../lib/utils";
 import { DecryptText } from "./DecryptText";
+import { useLanguage } from "../../lib/useLanguage";
 
 export interface ClassifiedCardProps {
   project: Project;
@@ -15,16 +16,19 @@ function padIndex(index: number): string {
   return String(index).padStart(3, "0");
 }
 
-const STATUS_CONFIG: Record<
-  Project["status"],
-  { label: string; colorVar: string }
-> = {
-  completed: { label: "COMPLETED", colorVar: "var(--cyber-accent-green)" },
-  "in-progress": {
-    label: "IN PROGRESS",
-    colorVar: "var(--cyber-accent-blue)",
-  },
-};
+function useStatusConfig() {
+  const { t } = useLanguage();
+  return {
+    completed: {
+      label: t("projects.status.completed").toUpperCase(),
+      colorVar: "var(--cyber-accent-green)",
+    },
+    "in-progress": {
+      label: t("projects.status.in-progress").toUpperCase(),
+      colorVar: "var(--cyber-accent-blue)",
+    },
+  };
+}
 
 type DeclassifyPhase = "idle" | "declassifying" | "declassified" | "done";
 
@@ -35,6 +39,8 @@ export function ClassifiedCard({
   onToggle,
   className,
 }: ClassifiedCardProps) {
+  const { lang } = useLanguage();
+  const STATUS_CONFIG = useStatusConfig();
   const dossierNumber = `DOSSIER-${padIndex(index)}`;
   const statusInfo = STATUS_CONFIG[project.status];
   const [phase, setPhase] = useState<DeclassifyPhase>("idle");
@@ -44,6 +50,13 @@ export function ClassifiedCard({
   const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
   const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
   const [isDesktop, setIsDesktop] = useState(false);
+
+  const titre =
+    lang === "en" && project.titreEn ? project.titreEn : project.titre;
+  const description =
+    lang === "en" && project.descriptionEn
+      ? project.descriptionEn
+      : project.description;
 
   useEffect(() => {
     const check = () => setIsDesktop(window.innerWidth >= 1024);
@@ -215,7 +228,7 @@ export function ClassifiedCard({
             className="mb-2 font-mono text-base font-semibold sm:text-lg"
             style={{ color: "var(--cyber-text-primary)" }}
           >
-            {project.titre}
+            {titre}
           </h3>
 
           {/* Expandable content */}
@@ -232,7 +245,7 @@ export function ClassifiedCard({
               className="mb-4 text-sm leading-relaxed"
               style={{ color: "var(--cyber-text-secondary)" }}
             >
-              {project.description}
+              {description}
             </p>
 
             {/* Stack badges */}

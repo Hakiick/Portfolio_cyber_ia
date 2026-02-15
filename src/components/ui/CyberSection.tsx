@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "../../lib/utils";
 import type { ReactNode } from "react";
 import { DecryptText } from "./DecryptText";
+import { useLanguage } from "../../lib/useLanguage";
 
 export interface CyberSectionProps {
   id: string;
@@ -34,6 +35,10 @@ export function CyberSection({
   const sectionRef = useRef<HTMLElement>(null);
   const [offset, setOffset] = useState(0);
   const [prefersReduced, setPrefersReduced] = useState(false);
+  const { t } = useLanguage();
+
+  // If title starts with "section.", translate it. Otherwise use as-is.
+  const displayTitle = title.startsWith("section.") ? t(title) : title;
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -71,7 +76,7 @@ export function CyberSection({
         }}
       >
         <span aria-hidden="true">&gt; </span>
-        <DecryptText text={title} as="span" />
+        <DecryptText text={displayTitle} as="span" />
         <span
           aria-hidden="true"
           className="inline-block w-[0.5em] h-[1.1em] ml-1 bg-[var(--cyber-accent-green)] align-middle animate-typing-cursor"

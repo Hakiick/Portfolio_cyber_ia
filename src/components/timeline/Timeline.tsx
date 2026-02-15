@@ -1,37 +1,59 @@
 import { useState, useEffect, useRef } from "react";
 import { CyberSection } from "../ui/CyberSection";
 import { timeline, type TimelineEntryType } from "../../data/timeline";
+import { useLanguage } from "../../lib/useLanguage";
 
-const typeConfig: Record<TimelineEntryType, { color: string; label: string }> =
-  {
-    formation: { color: "var(--cyber-accent-blue)", label: "Formation" },
-    experience: { color: "var(--cyber-accent-green)", label: "Experience" },
+function useTypeConfig() {
+  const { t } = useLanguage();
+  return {
+    formation: {
+      color: "var(--cyber-accent-blue)",
+      label: t("timeline.type.formation"),
+    },
+    experience: {
+      color: "var(--cyber-accent-green)",
+      label: t("timeline.type.experience"),
+    },
     certification: {
       color: "var(--cyber-accent-purple)",
-      label: "Certification",
+      label: t("timeline.type.certification"),
     },
-    pivot: { color: "var(--cyber-accent-red)", label: "Pivot" },
+    pivot: {
+      color: "var(--cyber-accent-red)",
+      label: t("timeline.type.pivot"),
+    },
   };
+}
 
 function TimelineEntry({
   date,
   titre,
+  titreEn,
   description,
+  descriptionEn,
   type,
   index,
   isLast,
 }: {
   date: string;
   titre: string;
+  titreEn?: string;
   description: string;
+  descriptionEn?: string;
   type: TimelineEntryType;
   index: number;
   isLast: boolean;
 }) {
   const entryRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const { lang } = useLanguage();
+  const typeConfig = useTypeConfig();
   const config = typeConfig[type];
   const isEven = index % 2 === 0;
+
+  const displayTitre = lang === "en" && titreEn ? titreEn : titre;
+  const displayDescription =
+    lang === "en" && descriptionEn ? descriptionEn : description;
 
   useEffect(() => {
     const el = entryRef.current;
@@ -82,14 +104,14 @@ function TimelineEntry({
           className="font-mono font-bold text-sm sm:text-base mb-1"
           style={{ color: "var(--cyber-text-primary)" }}
         >
-          {titre}
+          {displayTitre}
         </h3>
 
         <p
           className="text-xs sm:text-sm leading-relaxed"
           style={{ color: "var(--cyber-text-secondary)" }}
         >
-          {description}
+          {displayDescription}
         </p>
 
         <span
@@ -177,7 +199,7 @@ export function Timeline() {
   }, []);
 
   return (
-    <CyberSection id="timeline" title="timeline_">
+    <CyberSection id="timeline" title="section.timeline">
       <div ref={containerRef} className="relative">
         {/* Background line (dim) */}
         <div

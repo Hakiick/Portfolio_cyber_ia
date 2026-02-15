@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { CyberSection } from "../ui/CyberSection";
 import { ScrollReveal } from "../ui/ScrollReveal";
 import { skills, type SkillCategory } from "../../data/skills";
+import { useLanguage } from "../../lib/useLanguage";
 
 const CHART_SIZE = 300;
 const CENTER = CHART_SIZE / 2;
@@ -297,10 +298,14 @@ function BruteForceValue({
 
 function SkillDetailPanel({ category }: { category: SkillCategory }) {
   const [animKey, setAnimKey] = useState(0);
+  const { lang } = useLanguage();
 
   useEffect(() => {
     setAnimKey((k) => k + 1);
   }, [category.id]);
+
+  const label =
+    lang === "en" && category.labelEn ? category.labelEn : category.label;
 
   return (
     <div
@@ -316,7 +321,7 @@ function SkillDetailPanel({ category }: { category: SkillCategory }) {
           className="text-sm md:text-base font-bold"
           style={{ color: "var(--cyber-accent-green)" }}
         >
-          {category.label}
+          {label}
         </h3>
         <span
           className="text-xs px-2 py-1 rounded"
@@ -334,44 +339,48 @@ function SkillDetailPanel({ category }: { category: SkillCategory }) {
         </span>
       </div>
       <ul className="space-y-3">
-        {category.items.map((skill, i) => (
-          <li key={skill.name}>
-            <div className="flex justify-between text-xs mb-1">
-              <span style={{ color: "var(--cyber-text-primary)" }}>
-                {skill.name}
-              </span>
-              <span style={{ color: "var(--cyber-text-secondary)" }}>
-                <BruteForceValue
-                  key={`${skill.name}-${animKey}`}
-                  value={skill.level}
-                  delay={i * 100}
-                  active={true}
-                />
-              </span>
-            </div>
-            <div
-              className="w-full h-1.5 rounded-full overflow-hidden"
-              style={{ backgroundColor: "var(--cyber-border)" }}
-            >
+        {category.items.map((skill, i) => {
+          const skillName =
+            lang === "en" && skill.nameEn ? skill.nameEn : skill.name;
+          return (
+            <li key={skill.name}>
+              <div className="flex justify-between text-xs mb-1">
+                <span style={{ color: "var(--cyber-text-primary)" }}>
+                  {skillName}
+                </span>
+                <span style={{ color: "var(--cyber-text-secondary)" }}>
+                  <BruteForceValue
+                    key={`${skill.name}-${animKey}`}
+                    value={skill.level}
+                    delay={i * 100}
+                    active={true}
+                  />
+                </span>
+              </div>
               <div
-                className="h-full rounded-full"
-                style={{
-                  width: `${skill.level}%`,
-                  backgroundColor:
-                    skill.level >= 80
-                      ? "var(--cyber-accent-green)"
-                      : "var(--cyber-accent-blue)",
-                  boxShadow:
-                    skill.level >= 80
-                      ? "0 0 8px rgba(0,255,65,0.4)"
-                      : "0 0 8px rgba(0,212,255,0.4)",
-                  transition: `width ${800 + i * 100}ms ease-out`,
-                  transitionDelay: `${i * 100}ms`,
-                }}
-              />
-            </div>
-          </li>
-        ))}
+                className="w-full h-1.5 rounded-full overflow-hidden"
+                style={{ backgroundColor: "var(--cyber-border)" }}
+              >
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${skill.level}%`,
+                    backgroundColor:
+                      skill.level >= 80
+                        ? "var(--cyber-accent-green)"
+                        : "var(--cyber-accent-blue)",
+                    boxShadow:
+                      skill.level >= 80
+                        ? "0 0 8px rgba(0,255,65,0.4)"
+                        : "0 0 8px rgba(0,212,255,0.4)",
+                    transition: `width ${800 + i * 100}ms ease-out`,
+                    transitionDelay: `${i * 100}ms`,
+                  }}
+                />
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -415,10 +424,13 @@ function SkillCategoryButtons({
   hoveredIndex: number | null;
   onSelect: (index: number) => void;
 }) {
+  const { lang } = useLanguage();
+
   return (
     <div className="flex flex-wrap justify-center gap-2 mt-6 md:hidden">
       {skills.map((cat, i) => {
         const isActive = hoveredIndex === i;
+        const label = lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
         return (
           <button
             key={cat.id}
@@ -436,7 +448,7 @@ function SkillCategoryButtons({
                 : "var(--cyber-text-secondary)",
             }}
           >
-            {cat.label}
+            {label}
           </button>
         );
       })}
@@ -500,7 +512,7 @@ export function Skills() {
   );
 
   return (
-    <CyberSection id="skills" title="skills_">
+    <CyberSection id="skills" title="section.skills">
       <div ref={sectionRef}>
         <ScrollReveal animation="fade-in">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">

@@ -5,6 +5,7 @@ import { ClassifiedCard } from "../ui/ClassifiedCard";
 import { ScrollReveal } from "../ui/ScrollReveal";
 import { projects, type ProjectCategory } from "../../data/projects";
 import { useAchievements } from "../../lib/useAchievements";
+import { useLanguage } from "../../lib/useLanguage";
 
 interface FilterConfig {
   label: string;
@@ -12,11 +13,11 @@ interface FilterConfig {
 }
 
 const FILTERS: FilterConfig[] = [
-  { label: "Tous", categories: null },
-  { label: "IA", categories: ["ia", "ia-cyber", "ia-meta"] },
-  { label: "Cyber", categories: ["cyber", "ia-cyber"] },
-  { label: "DevOps", categories: ["devops"] },
-  { label: "IoT", categories: ["cloud-iot"] },
+  { label: "projects.filter.all", categories: null },
+  { label: "projects.filter.ia", categories: ["ia", "ia-cyber", "ia-meta"] },
+  { label: "projects.filter.cyber", categories: ["cyber", "ia-cyber"] },
+  { label: "projects.filter.devops", categories: ["devops"] },
+  { label: "projects.filter.iot", categories: ["cloud-iot"] },
 ];
 
 function filterProjects(categories: ProjectCategory[] | null) {
@@ -25,10 +26,13 @@ function filterProjects(categories: ProjectCategory[] | null) {
 }
 
 export function Projects() {
-  const [activeFilter, setActiveFilter] = useState<string>("Tous");
+  const [activeFilter, setActiveFilter] = useState<string>(
+    "projects.filter.all",
+  );
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [openedProjects, setOpenedProjects] = useState<Set<string>>(new Set());
   const { unlock } = useAchievements();
+  const { t } = useLanguage();
 
   const activeConfig = FILTERS.find((f) => f.label === activeFilter);
   const filteredProjects = filterProjects(activeConfig?.categories ?? null);
@@ -54,7 +58,7 @@ export function Projects() {
   }, [openedProjects, unlock]);
 
   return (
-    <CyberSection id="projects" title="projects_">
+    <CyberSection id="projects" title="section.projects">
       {/* Filter bar */}
       <ScrollReveal animation="fade-in">
         <div className="mb-6 flex flex-wrap gap-2 sm:mb-8">
@@ -78,7 +82,7 @@ export function Projects() {
                   boxShadow: isActive ? "var(--cyber-glow-green)" : "none",
                 }}
               >
-                {filter.label}
+                {t(filter.label)}
               </button>
             );
           })}

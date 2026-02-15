@@ -6,51 +6,54 @@ import {
   certifications,
   type CertificationStatus,
 } from "../../data/certifications";
+import { useLanguage } from "../../lib/useLanguage";
 
-const statusConfig: Record<
-  CertificationStatus,
-  {
-    label: string;
-    variant: "green" | "blue" | "gray";
-    color: string;
-    glow: string;
-  }
-> = {
-  obtained: {
-    label: "Obtained",
-    variant: "green",
-    color: "var(--cyber-accent-green)",
-    glow: "rgba(0, 255, 65, 0.15)",
-  },
-  "in-progress": {
-    label: "In Progress",
-    variant: "blue",
-    color: "var(--cyber-accent-blue)",
-    glow: "rgba(0, 212, 255, 0.15)",
-  },
-  preparing: {
-    label: "Preparing",
-    variant: "gray",
-    color: "var(--cyber-text-secondary)",
-    glow: "rgba(138, 138, 138, 0.1)",
-  },
-};
+function useStatusConfig() {
+  const { t } = useLanguage();
+  return {
+    obtained: {
+      label: t("certifications.status.obtained"),
+      variant: "green" as const,
+      color: "var(--cyber-accent-green)",
+      glow: "rgba(0, 255, 65, 0.15)",
+    },
+    "in-progress": {
+      label: t("certifications.status.in-progress"),
+      variant: "blue" as const,
+      color: "var(--cyber-accent-blue)",
+      glow: "rgba(0, 212, 255, 0.15)",
+    },
+    preparing: {
+      label: t("certifications.status.preparing"),
+      variant: "gray" as const,
+      color: "var(--cyber-text-secondary)",
+      glow: "rgba(138, 138, 138, 0.1)",
+    },
+  };
+}
 
 function CertificationCard({
   nom,
   organisme,
   status,
   description,
+  descriptionEn,
   progress,
 }: {
   nom: string;
   organisme: string;
   status: CertificationStatus;
   description: string;
+  descriptionEn?: string;
   progress: number;
 }) {
+  const { lang } = useLanguage();
+  const statusConfig = useStatusConfig();
   const config = statusConfig[status];
   const [isFlipped, setIsFlipped] = useState(false);
+
+  const displayDescription =
+    lang === "en" && descriptionEn ? descriptionEn : description;
 
   return (
     <div
@@ -143,7 +146,7 @@ function CertificationCard({
                 className="text-sm mb-3"
                 style={{ color: "var(--cyber-text-primary)" }}
               >
-                {description}
+                {displayDescription}
               </p>
 
               <p
@@ -193,7 +196,7 @@ function CertificationCard({
 
 export function Certifications() {
   return (
-    <CyberSection id="certifications" title="certifications_">
+    <CyberSection id="certifications" title="section.certifications">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {certifications.map((cert, i) => (
           <ScrollReveal key={cert.nom} animation="slide-up" delay={i * 100}>
