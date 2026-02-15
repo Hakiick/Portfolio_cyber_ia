@@ -1,4 +1,5 @@
 import { cn } from "../../lib/utils";
+import { useMagneticEffect } from "../../lib/useMagneticEffect";
 import type { ReactNode, MouseEventHandler } from "react";
 
 export interface CyberButtonProps {
@@ -54,6 +55,7 @@ export function CyberButton({
   href,
   className,
 }: CyberButtonProps) {
+  const magnetic = useMagneticEffect();
   const classes = cn(
     baseStyles,
     variantStyles[variant],
@@ -63,14 +65,30 @@ export function CyberButton({
 
   if (href) {
     return (
-      <a href={href} onClick={onClick} className={classes}>
+      <a
+        href={href}
+        onClick={onClick}
+        className={classes}
+        ref={magnetic.ref as React.RefObject<HTMLAnchorElement>}
+        onMouseMove={magnetic.onMouseMove}
+        onMouseLeave={magnetic.onMouseLeave}
+        style={magnetic.style}
+      >
         {children}
       </a>
     );
   }
 
   return (
-    <button type="button" onClick={onClick} className={classes}>
+    <button
+      type="button"
+      onClick={onClick}
+      className={classes}
+      ref={magnetic.ref as React.RefObject<HTMLButtonElement>}
+      onMouseMove={magnetic.onMouseMove}
+      onMouseLeave={magnetic.onMouseLeave}
+      style={magnetic.style}
+    >
       {children}
     </button>
   );
