@@ -1,9 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 import { CyberSection } from "../ui/CyberSection";
 import { ClassifiedCard } from "../ui/ClassifiedCard";
 import { ScrollReveal } from "../ui/ScrollReveal";
 import { projects, type ProjectCategory } from "../../data/projects";
+import { useAchievements } from "../../lib/useAchievements";
 
 interface FilterConfig {
   label: string;
@@ -26,6 +27,8 @@ function filterProjects(categories: ProjectCategory[] | null) {
 export function Projects() {
   const [activeFilter, setActiveFilter] = useState<string>("Tous");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [openedProjects, setOpenedProjects] = useState<Set<string>>(new Set());
+  const { unlock } = useAchievements();
 
   const activeConfig = FILTERS.find((f) => f.label === activeFilter);
   const filteredProjects = filterProjects(activeConfig?.categories ?? null);
@@ -37,7 +40,18 @@ export function Projects() {
 
   const handleToggle = useCallback((id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
+    setOpenedProjects((prev) => {
+      const updated = new Set(prev);
+      updated.add(id);
+      return updated;
+    });
   }, []);
+
+  useEffect(() => {
+    if (openedProjects.size === projects.length) {
+      unlock("all-projects");
+    }
+  }, [openedProjects, unlock]);
 
   return (
     <CyberSection id="projects" title="projects_">

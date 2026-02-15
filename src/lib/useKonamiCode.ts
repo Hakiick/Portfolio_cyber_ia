@@ -1,5 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 
+function unlockKonamiAchievement() {
+  const event = new CustomEvent("achievement-unlocked", {
+    detail: {
+      id: "konami-code",
+      title: "God Mode",
+      description: "Activer le Konami Code",
+      icon: "🎮",
+      unlocked: true,
+      unlockedAt: Date.now(),
+    },
+  });
+  window.dispatchEvent(event);
+}
+
 const KONAMI_SEQUENCE = [
   "ArrowUp",
   "ArrowUp",
@@ -32,6 +46,7 @@ export function useKonamiCode(): boolean {
           triggeredRef.current = true;
           indexRef.current = 0;
           setActive(true);
+          unlockKonamiAchievement();
 
           document.documentElement.classList.add("konami-active");
 

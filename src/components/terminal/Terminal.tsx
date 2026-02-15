@@ -5,6 +5,7 @@ import { ScrollReveal } from "../ui/ScrollReveal";
 import { MatrixRain } from "../ui/MatrixRain";
 import { terminalCommands } from "../../data/terminal-commands";
 import type { TerminalCommand } from "../../data/terminal-commands";
+import { useAchievements, type Achievement } from "../../lib/useAchievements";
 
 interface HistoryEntry {
   command: string;
@@ -121,6 +122,36 @@ function getAutoCompleteMatches(input: string): string[] {
     .map((c) => c.name);
 }
 
+function formatAchievements(achievements: Achievement[]): string {
+  const lines = [
+    "╔════════════════════════════════════════════════════════════════╗",
+    "║                     🏆 ACHIEVEMENTS 🏆                         ║",
+    "╠════════════════════════════════════════════════════════════════╣",
+  ];
+
+  achievements.forEach((ach) => {
+    const status = ach.unlocked ? "[OK]✓" : "[ ]✗";
+    const statusColor = ach.unlocked ? "[OK]" : "[RED]";
+    const icon = ach.icon;
+    const title = ach.title.padEnd(20);
+    const desc = ach.description;
+    lines.push(`${statusColor}${status} ${icon} ${title} — ${desc}`);
+  });
+
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+  lines.push(
+    "╠════════════════════════════════════════════════════════════════╣",
+  );
+  lines.push(
+    `║ Progress: ${unlockedCount}/${achievements.length} unlocked${" ".repeat(42 - String(unlockedCount).length - String(achievements.length).length)}║`,
+  );
+  lines.push(
+    "╚════════════════════════════════════════════════════════════════╝",
+  );
+
+  return lines.join("\n");
+}
+
 function ColoredLine({ line }: { line: string }) {
   const segments = parseColoredLine(line);
   return (
@@ -211,10 +242,13 @@ export function Terminal() {
   const [inputValue, setInputValue] = useState("");
   const [showMatrix, setShowMatrix] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [hasTypedCommand, setHasTypedCommand] = useState(false);
 
   const outputRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const streamTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  const { achievements, unlock } = useAchievements();
 
   // Auto-scroll to bottom when history changes
   useEffect(() => {
@@ -287,6 +321,12 @@ export function Terminal() {
       if (!trimmed) return;
       if (isStreaming) return;
 
+      // Unlock terminal-user achievement on first command
+      if (!hasTypedCommand) {
+        setHasTypedCommand(true);
+        unlock("terminal-user");
+      }
+
       // Handle clear command
       if (trimmed === "clear") {
         setHistory([]);
@@ -304,13 +344,34 @@ export function Terminal() {
         output = `command not found: ${trimmed}. Type 'help' for available commands.`;
       }
 
-      // Handle matrix special signal
+      // Handle special signals
       if (output === "__MATRIX__") {
         setShowMatrix(true);
+        unlock("matrix-entered");
         setHistory((prev) => [...prev, { command: trimmed, output: "" }]);
         setCommandHistory((prev) => [...prev, trimmed]);
         setHistoryIndex(-1);
         return;
+      }
+
+      if (output === "__ACHIEVEMENTS__") {
+        const achievementOutput = formatAchievements(achievements);
+        setHistory((prev) => [
+          ...prev,
+          { command: trimmed, output: achievementOutput },
+        ]);
+        setCommandHistory((prev) => [...prev, trimmed]);
+        setHistoryIndex(-1);
+        return;
+      }
+
+      // Achievement triggers
+      if (trimmed === "sudo hire-me") {
+        unlock("hire-me");
+      }
+
+      if (output.includes("FLAG{")) {
+        unlock("secret-finder");
       }
 
       // Handle streaming output (hack, rm -rf)
@@ -323,7 +384,7 @@ export function Terminal() {
       setCommandHistory((prev) => [...prev, trimmed]);
       setHistoryIndex(-1);
     },
-    [isStreaming, streamOutput],
+    [isStreaming, streamOutput, hasTypedCommand, achievements, unlock],
   );
 
   const handleKeyDown = useCallback(

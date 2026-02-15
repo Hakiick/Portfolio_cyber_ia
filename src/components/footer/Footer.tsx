@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { profile } from "../../data/profile";
+import { useAchievements } from "../../lib/useAchievements";
 
 const EPOCH = new Date("2025-01-01T00:00:00Z").getTime();
 
@@ -49,9 +50,31 @@ function TerminalLine({
 
 export function Footer() {
   const uptime = useUptime();
+  const { unlock } = useAchievements();
+  const footerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const footer = footerRef.current;
+    if (!footer) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            unlock("scroll-master");
+          }
+        });
+      },
+      { threshold: 0.5 },
+    );
+
+    observer.observe(footer);
+    return () => observer.disconnect();
+  }, [unlock]);
 
   return (
     <footer
+      ref={footerRef}
       className="w-full px-4 py-6"
       style={{
         backgroundColor: "var(--cyber-bg-terminal)",
