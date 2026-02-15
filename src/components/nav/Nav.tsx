@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
 interface NavSection {
   id: string;
@@ -14,6 +14,61 @@ const NAV_SECTIONS: NavSection[] = [
   { id: "terminal", label: "Terminal" },
   { id: "contact", label: "Contact" },
 ];
+
+function useClock() {
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      setTime(
+        `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`,
+      );
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return time;
+}
+
+function SystemTray({ compact }: { compact?: boolean }) {
+  const time = useClock();
+
+  const items = useMemo(
+    () => (
+      <>
+        <span
+          style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: compact ? "0.7rem" : "0.65rem",
+            color: "var(--cyber-accent-green)",
+            letterSpacing: "0.05em",
+          }}
+        >
+          {time}
+        </span>
+        <span
+          style={{
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: compact ? "0.65rem" : "0.6rem",
+            color: "var(--cyber-accent-green)",
+            padding: "2px 6px",
+            border: "1px solid var(--cyber-accent-green)",
+            borderRadius: "2px",
+            opacity: 0.8,
+          }}
+        >
+          🔒 SECURE
+        </span>
+      </>
+    ),
+    [time, compact],
+  );
+
+  return items;
+}
 
 export default function Nav() {
   const [activeSection, setActiveSection] = useState<string>("");
@@ -192,11 +247,13 @@ export default function Nav() {
           ))}
         </div>
 
-        {/* System tray (right zone, empty for now) */}
+        {/* System tray (right zone) */}
         <div
           className="nav-system-tray"
           style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
-        />
+        >
+          <SystemTray />
+        </div>
 
         {/* Mobile hamburger button */}
         <button
@@ -309,7 +366,9 @@ export default function Nav() {
             gap: "0.75rem",
             marginTop: "1rem",
           }}
-        />
+        >
+          <SystemTray compact />
+        </div>
       </div>
 
       {/* Responsive styles */}
