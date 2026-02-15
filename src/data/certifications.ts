@@ -5,6 +5,7 @@ export interface Certification {
   organisme: string;
   status: CertificationStatus;
   description: string;
+  progress: number;
 }
 
 export const certifications: Certification[] = [
@@ -13,23 +14,27 @@ export const certifications: Certification[] = [
     organisme: "INE Security",
     status: "obtained",
     description: "Junior Penetration Tester",
+    progress: 100,
   },
   {
     nom: "AZ-900",
     organisme: "Microsoft",
     status: "preparing",
     description: "Azure Fundamentals",
+    progress: 20,
   },
   {
     nom: "AWS Cloud Practitioner",
     organisme: "AWS",
     status: "preparing",
     description: "Cloud Fundamentals",
+    progress: 15,
   },
   {
     nom: "AWS AI Practitioner",
     organisme: "AWS",
     status: "in-progress",
     description: "AI/ML Fundamentals",
+    progress: 60,
   },
 ];
