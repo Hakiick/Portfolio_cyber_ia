@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hakick.dev/sitemap.xml
