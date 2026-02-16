@@ -5,11 +5,11 @@ import { profile } from "../../data/profile";
 import { useAchievements } from "../../lib/useAchievements";
 import { useLanguage } from "../../lib/useLanguage";
 
-const ASCII_HACK = `██   ██  █████  ██████ ██   ██
-██   ██ ██   ██ ██     ██  ██
-███████ ███████ ██     █████
-██   ██ ██   ██ ██     ██  ██
-██   ██ ██   ██ ██████ ██   ██`;
+const ASCII_HAKICK = `██   ██  █████  ██   ██ ██  ██████ ██   ██
+██   ██ ██   ██ ██  ██  ██ ██      ██  ██
+███████ ███████ █████   ██ ██      █████
+██   ██ ██   ██ ██  ██  ██ ██      ██  ██
+██   ██ ██   ██ ██   ██ ██  ██████ ██   ██`;
 
 const ASCII_H = `██   ██
 ██   ██
@@ -41,7 +41,7 @@ export function Hero() {
     return () => clearTimeout(timer);
   }, [unlock]);
 
-  const asciiText = isMobile ? ASCII_H : ASCII_HACK;
+  const asciiText = isMobile ? ASCII_H : ASCII_HAKICK;
   const titre =
     lang === "en" && profile.titreEn ? profile.titreEn : profile.titre;
   const bio = getShortBio(
@@ -123,12 +123,12 @@ export function Hero() {
 
         {/* ASCII Art HACK */}
         <pre
-          className="font-mono text-[0.6rem] sm:text-xs md:text-sm lg:text-base leading-none mb-6 select-none whitespace-pre"
+          className="font-mono text-[0.35rem] sm:text-[0.5rem] md:text-xs lg:text-sm leading-none mb-6 select-none whitespace-pre"
           style={{
             color: "var(--cyber-accent-green)",
             textShadow: "0 0 20px rgba(0, 255, 65, 0.3)",
           }}
-          aria-label="HACK"
+          aria-label="HAKICK"
         >
           {asciiText}
         </pre>
