@@ -150,8 +150,10 @@ export function Hero() {
             className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 rounded-full"
             style={{
               padding: "3px",
-              background: "linear-gradient(135deg, var(--cyber-accent-green), var(--cyber-accent-blue), var(--cyber-accent-purple))",
-              boxShadow: "0 0 30px rgba(0, 255, 65, 0.3), 0 0 60px rgba(0, 212, 255, 0.15)",
+              background:
+                "linear-gradient(135deg, var(--cyber-accent-green), var(--cyber-accent-blue), var(--cyber-accent-purple))",
+              boxShadow:
+                "0 0 30px rgba(0, 255, 65, 0.3), 0 0 60px rgba(0, 212, 255, 0.15)",
               animation: "hero-photo-glow 4s ease-in-out infinite alternate",
             }}
           >
