@@ -1,6 +1,7 @@
 import { GlitchText } from "../ui/GlitchText";
 import { useLanguage } from "../../lib/useLanguage";
 import { BrainModel } from "./BrainModel";
+import { SkullModel } from "./SkullModel";
 
 interface CardData {
   title: string;
@@ -119,24 +120,8 @@ export function ShowcaseCards() {
           border: "1px solid var(--cyber-border)",
         }}
       >
-        <div
-          id="skull-card-placeholder"
-          className="flex-1 flex items-center justify-center relative overflow-hidden"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(0,255,65,0.08) 0%, transparent 70%)",
-          }}
-        >
-          <span
-            className="text-6xl"
-            style={{
-              color: "var(--cyber-accent-green)",
-              opacity: 0.3,
-              textShadow: "0 0 20px rgba(0, 255, 65, 0.4)",
-            }}
-          >
-            ☠
-          </span>
+        <div className="flex-1 relative overflow-hidden">
+          <SkullModel className="absolute inset-0" />
         </div>
         <div
           className="px-4 py-3"
