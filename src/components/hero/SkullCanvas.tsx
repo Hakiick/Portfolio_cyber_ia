@@ -90,7 +90,8 @@ export default function SkullCanvas() {
     <Canvas
       dpr={[1, 1.5]}
       camera={{ position: [0, -0.3, 4], fov: 50 }}
-      style={{ background: "transparent" }}
+      gl={{ alpha: true, antialias: true, powerPreference: "default" }}
+      style={{ background: "transparent", touchAction: "none" }}
     >
       <ambientLight intensity={0.2} />
       <pointLight position={[3, 3, 3]} intensity={0.5} color="#00ff41" />
@@ -98,6 +99,7 @@ export default function SkullCanvas() {
       <OrbitControls
         enableZoom={false}
         enablePan={false}
+        enableRotate
         autoRotate
         autoRotateSpeed={1}
         enableDamping
