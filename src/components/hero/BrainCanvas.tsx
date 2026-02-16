@@ -62,13 +62,10 @@ function BrainScene() {
     };
   }, []);
 
-  useFrame((_state, delta) => {
+  useFrame(() => {
     if (pointsRef.current) {
       const scale = 1 + Math.sin(Date.now() * 0.002) * 0.015;
       pointsRef.current.scale.setScalar(scale);
-    }
-    if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.05;
     }
   });
 
@@ -114,6 +111,9 @@ export default function BrainCanvas() {
         enablePan={false}
         autoRotate
         autoRotateSpeed={1.5}
+        enableDamping
+        dampingFactor={0.1}
+        rotateSpeed={0.8}
       />
       <ambientLight intensity={0.3} />
       <pointLight position={[5, 5, 5]} intensity={0.8} color="#b44aff" />

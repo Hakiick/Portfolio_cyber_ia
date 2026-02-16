@@ -7,9 +7,10 @@ import * as THREE from "three";
 function SkullScene() {
   const groupRef = useRef<THREE.Group>(null);
 
-  useFrame((_, delta) => {
+  useFrame((state) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.2;
+      groupRef.current.position.y =
+        Math.sin(state.clock.elapsedTime * 0.8) * 0.05;
     }
   });
 
@@ -98,7 +99,10 @@ export default function SkullCanvas() {
         enableZoom={false}
         enablePan={false}
         autoRotate
-        autoRotateSpeed={1.5}
+        autoRotateSpeed={1}
+        enableDamping
+        dampingFactor={0.1}
+        rotateSpeed={0.8}
       />
       <EffectComposer>
         <Bloom luminanceThreshold={0.2} intensity={0.8} levels={3} mipmapBlur />
