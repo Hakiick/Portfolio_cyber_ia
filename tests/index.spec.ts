@@ -2,9 +2,9 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Boot Sequence", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("http://localhost:4321");
+    await page.goto("/");
     await page.evaluate(() => sessionStorage.clear());
-    await page.goto("http://localhost:4321");
+    await page.goto("/");
     // Wait for React hydration before interacting
     await page
       .locator('[data-testid="boot-sequence"][data-hydrated="true"]')
@@ -36,7 +36,7 @@ test.describe("Boot Sequence", () => {
       { timeout: 5000 },
     );
 
-    await page.goto("http://localhost:4321");
+    await page.goto("/");
     // On second visit, boot should not appear (sessionStorage)
     await expect(page.locator('[data-testid="boot-sequence"]')).not.toBeVisible(
       { timeout: 3000 },
