@@ -3,7 +3,7 @@ import { useMagneticEffect } from "../../lib/useMagneticEffect";
 import type { ReactNode, MouseEventHandler } from "react";
 
 export interface CyberButtonProps {
-  variant?: "primary" | "secondary" | "danger";
+  variant?: "primary" | "secondary" | "danger" | "filled";
   size?: "sm" | "md" | "lg";
   children: ReactNode;
   onClick?: MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
@@ -29,6 +29,12 @@ const variantStyles: Record<
     "border-[var(--cyber-accent-red)] text-[var(--cyber-accent-red)]",
     "hover:shadow-[0_0_20px_rgba(255,62,62,0.3)]",
     "hover:text-shadow-[0_0_10px_rgba(255,62,62,0.5)]",
+  ].join(" "),
+  filled: [
+    "bg-[var(--cyber-accent-green)] text-[var(--cyber-bg-primary)]",
+    "border-[var(--cyber-accent-green)] font-bold",
+    "hover:shadow-[0_0_20px_rgba(0,255,65,0.4)]",
+    "hover:scale-[1.02]",
   ].join(" "),
 };
 
