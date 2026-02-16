@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { CyberButton } from "../ui/CyberButton";
 import { ShowcaseCards } from "./ShowcaseCards";
 import { profile } from "../../data/profile";
@@ -17,15 +17,38 @@ const ASCII_H = `██   ██
 ██   ██
 ██   ██`;
 
+const GLITCH_DURATION = 300;
+const GLITCH_INTERVAL = 4000;
+
 function getShortBio(bio: string): string {
   const sentences = bio.split(". ");
   return sentences.slice(0, 2).join(". ") + ".";
 }
 
+function useAsciiGlitch() {
+  const ref = useRef<HTMLPreElement>(null);
+
+  const triggerGlitch = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.classList.add("is-glitching");
+    setTimeout(() => el.classList.remove("is-glitching"), GLITCH_DURATION);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(triggerGlitch, GLITCH_INTERVAL);
+    return () => clearInterval(interval);
+  }, [triggerGlitch]);
+
+  return ref;
+}
+
 export function Hero() {
   const [isMobile, setIsMobile] = useState(false);
+  const [photoLoaded, setPhotoLoaded] = useState(false);
   const { unlock } = useAchievements();
   const { lang } = useLanguage();
+  const asciiRef = useAsciiGlitch();
 
   useEffect(() => {
     const handleResize = () => {
@@ -121,9 +144,49 @@ export function Hero() {
           </div>
         </div>
 
-        {/* ASCII Art HACK */}
+        {/* Profile photo with cyber styling */}
+        <div className="flex justify-center mb-6">
+          <div
+            className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 rounded-full"
+            style={{
+              padding: "3px",
+              background: "linear-gradient(135deg, var(--cyber-accent-green), var(--cyber-accent-blue), var(--cyber-accent-purple))",
+              boxShadow: "0 0 30px rgba(0, 255, 65, 0.3), 0 0 60px rgba(0, 212, 255, 0.15)",
+              animation: "hero-photo-glow 4s ease-in-out infinite alternate",
+            }}
+          >
+            <div
+              className="w-full h-full rounded-full overflow-hidden"
+              style={{ backgroundColor: "var(--cyber-bg-secondary)" }}
+            >
+              <img
+                src="/at-work.jpg"
+                alt="Hakick — Maxime"
+                className="w-full h-full object-cover rounded-full"
+                style={{ display: photoLoaded ? "block" : "none" }}
+                onLoad={() => setPhotoLoaded(true)}
+                onError={() => setPhotoLoaded(false)}
+              />
+              {!photoLoaded && (
+                <div
+                  className="w-full h-full flex items-center justify-center font-mono text-4xl sm:text-5xl md:text-6xl font-bold select-none"
+                  style={{
+                    color: "var(--cyber-accent-green)",
+                    textShadow: "0 0 20px rgba(0, 255, 65, 0.4)",
+                  }}
+                >
+                  H
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ASCII Art HAKICK with glitch animation */}
         <pre
-          className="font-mono text-[0.35rem] sm:text-[0.5rem] md:text-xs lg:text-sm leading-none mb-6 select-none whitespace-pre"
+          ref={asciiRef}
+          data-text={asciiText}
+          className="glitch-effect font-mono text-[0.3rem] sm:text-[0.4rem] md:text-[0.5rem] lg:text-xs leading-none mb-6 select-none whitespace-pre"
           style={{
             color: "var(--cyber-accent-green)",
             textShadow: "0 0 20px rgba(0, 255, 65, 0.3)",
@@ -132,6 +195,14 @@ export function Hero() {
         >
           {asciiText}
         </pre>
+
+        <style>{`
+          @keyframes hero-photo-glow {
+            0% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.3), 0 0 60px rgba(0, 212, 255, 0.15); }
+            50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), 0 0 80px rgba(180, 74, 255, 0.2); }
+            100% { box-shadow: 0 0 30px rgba(180, 74, 255, 0.3), 0 0 60px rgba(0, 255, 65, 0.15); }
+          }
+        `}</style>
 
         {/* Titre gradient */}
         <h1

@@ -1,7 +1,7 @@
 export function SectionDivider() {
   return (
     <div
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden my-16 md:my-24 lg:my-32"
       style={{ height: "2px" }}
       aria-hidden="true"
     >
