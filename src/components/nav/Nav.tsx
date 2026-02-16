@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { LogoH } from "../ui/LogoH";
+
 import { useAchievements } from "../../lib/useAchievements";
 import { useLanguage } from "../../lib/useLanguage";
 import { useSoundEngine } from "../../lib/useSoundEngine";
@@ -181,6 +181,31 @@ function SystemTray({ compact }: { compact?: boolean }) {
         >
           🔒 SECURE
         </span>
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: compact ? "0.65rem" : "0.6rem",
+            color: "var(--cyber-accent-green)",
+            textTransform: "uppercase" as const,
+            letterSpacing: "0.1em",
+          }}
+        >
+          <span
+            style={{
+              display: "inline-block",
+              width: "8px",
+              height: "8px",
+              borderRadius: "50%",
+              backgroundColor: "var(--cyber-accent-green)",
+              boxShadow: "0 0 6px rgba(0,255,65,0.6)",
+              animation: "pulse-glow 2s ease-in-out infinite",
+            }}
+          />
+          ONLINE
+        </span>
       </>
     ),
     [time, compact, unlockedCount, totalCount],
@@ -320,7 +345,18 @@ export default function Nav() {
             alignItems: "center",
           }}
         >
-          <LogoH size={28} />
+          <span
+            className="font-mono"
+            style={{
+              fontSize: "1.25rem",
+              fontWeight: 700,
+              color: "var(--cyber-accent-green)",
+              textShadow: "0 0 10px rgba(0,255,65,0.5)",
+            }}
+          >
+            H{" "}
+            <span style={{ color: "var(--cyber-text-secondary)" }}>&gt;_</span>
+          </span>
         </button>
 
         {/* Desktop links */}
