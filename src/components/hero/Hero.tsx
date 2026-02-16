@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { CyberButton } from "../ui/CyberButton";
+import { ShowcaseCards } from "./ShowcaseCards";
 import { profile } from "../../data/profile";
 import { useAchievements } from "../../lib/useAchievements";
 import { useLanguage } from "../../lib/useLanguage";
@@ -310,6 +311,11 @@ export function Hero() {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* Showcase cards — full width, outside max-w-4xl */}
+      <div className="relative z-10 w-full">
+        <ShowcaseCards />
       </div>
     </section>
   );
