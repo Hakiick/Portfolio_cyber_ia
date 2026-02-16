@@ -46,9 +46,17 @@ function useAsciiGlitch() {
 export function Hero() {
   const [isMobile, setIsMobile] = useState(false);
   const [photoLoaded, setPhotoLoaded] = useState(false);
+  const photoRef = useRef<HTMLImageElement>(null);
   const { unlock } = useAchievements();
   const { lang } = useLanguage();
   const asciiRef = useAsciiGlitch();
+
+  useEffect(() => {
+    const img = photoRef.current;
+    if (img && img.complete && img.naturalWidth > 0) {
+      setPhotoLoaded(true);
+    }
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -162,6 +170,7 @@ export function Hero() {
               style={{ backgroundColor: "var(--cyber-bg-secondary)" }}
             >
               <img
+                ref={photoRef}
                 src="/at-work.jpg"
                 alt="Hakick — Maxime"
                 className="absolute inset-0 w-full h-full object-cover rounded-full"
