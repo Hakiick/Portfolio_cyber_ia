@@ -1,54 +1,20 @@
-import { useState, useEffect, useRef } from "react";
-import { GlitchText } from "../ui/GlitchText";
+import { useState, useEffect } from "react";
 import { CyberButton } from "../ui/CyberButton";
 import { profile } from "../../data/profile";
 import { useAchievements } from "../../lib/useAchievements";
 import { useLanguage } from "../../lib/useLanguage";
 
-const ASCII_HAKICK = `██╗  ██╗ █████╗ ██╗  ██╗██╗ ██████╗██╗  ██╗
-██║  ██║██╔══██╗██║ ██╔╝██║██╔════╝██║ ██╔╝
-███████║███████║█████╔╝ ██║██║     █████╔╝
-██╔══██║██╔══██║██╔═██╗ ██║██║     ██╔═██╗
-██║  ██║██║  ██║██║  ██╗██║╚██████╗██║  ██╗
-╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝ ╚═════╝╚═╝  ╚═╝`;
+const ASCII_HACK = `██   ██  █████  ██████ ██   ██
+██   ██ ██   ██ ██     ██  ██
+███████ ███████ ██     █████
+██   ██ ██   ██ ██     ██  ██
+██   ██ ██   ██ ██████ ██   ██`;
 
-const ASCII_H = `██╗  ██╗
-██║  ██║
-███████║
-██╔══██║
-██║  ██║
-╚═╝  ╚═╝`;
-
-const CHAR_DELAY_MS = 4;
-
-function useTypewriter(text: string, delayMs: number, startTyping: boolean) {
-  const [displayed, setDisplayed] = useState("");
-  const [done, setDone] = useState(false);
-  const indexRef = useRef(0);
-
-  useEffect(() => {
-    if (!startTyping) return;
-    indexRef.current = 0;
-    setDisplayed("");
-    setDone(false);
-
-    const totalChars = text.length;
-    const interval = setInterval(() => {
-      indexRef.current += 1;
-      if (indexRef.current >= totalChars) {
-        setDisplayed(text);
-        setDone(true);
-        clearInterval(interval);
-      } else {
-        setDisplayed(text.slice(0, indexRef.current));
-      }
-    }, delayMs);
-
-    return () => clearInterval(interval);
-  }, [text, delayMs, startTyping]);
-
-  return { displayed, done };
-}
+const ASCII_H = `██   ██
+██   ██
+███████
+██   ██
+██   ██`;
 
 function getShortBio(bio: string): string {
   const sentences = bio.split(". ");
@@ -57,28 +23,16 @@ function getShortBio(bio: string): string {
 
 export function Hero() {
   const [isMobile, setIsMobile] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
-  const [startTyping, setStartTyping] = useState(false);
   const { unlock } = useAchievements();
   const { lang } = useLanguage();
 
   useEffect(() => {
-    const w = window.innerWidth;
-    setIsMobile(w < 640);
-    setIsTablet(w >= 640 && w < 1024);
-
     const handleResize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width < 640);
-      setIsTablet(width >= 640 && width < 1024);
+      setIsMobile(window.innerWidth < 640);
     };
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setStartTyping(true), 300);
-    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -86,81 +40,190 @@ export function Hero() {
     return () => clearTimeout(timer);
   }, [unlock]);
 
-  const asciiText = isMobile ? ASCII_H : ASCII_HAKICK;
-  const { displayed, done } = useTypewriter(
-    asciiText,
-    CHAR_DELAY_MS,
-    startTyping,
+  const asciiText = isMobile ? ASCII_H : ASCII_HACK;
+  const titre =
+    lang === "en" && profile.titreEn ? profile.titreEn : profile.titre;
+  const bio = getShortBio(
+    lang === "en" && profile.bioEn ? profile.bioEn : profile.bio,
   );
-
-  const fontSizeClass = isMobile
-    ? "text-xs"
-    : isTablet
-      ? "text-[0.5rem] sm:text-xs"
-      : "text-xs md:text-sm lg:text-base";
 
   return (
     <section
       id="hero"
       className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden"
     >
+      {/* Gradient blobs background */}
+      <div
+        className="absolute inset-0 z-0"
+        aria-hidden="true"
+        style={{
+          background: [
+            "radial-gradient(circle at 80% 20%, rgba(180,74,255,0.08) 0%, transparent 50%)",
+            "radial-gradient(circle at 20% 80%, rgba(0,255,65,0.05) 0%, transparent 50%)",
+            "radial-gradient(circle at 50% 50%, rgba(0,212,255,0.04) 0%, transparent 40%)",
+          ].join(", "),
+        }}
+      />
+
+      {/* Brain 3D container */}
       <div
         id="brain-container"
         className="absolute inset-0 z-0 opacity-30 pointer-events-none"
         aria-hidden="true"
       />
 
+      {/* Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto">
-        <pre
-          className={`font-mono ${fontSizeClass} leading-tight mb-6 select-none whitespace-pre`}
-          style={{ color: "var(--cyber-accent-green)" }}
-          aria-label="HAKICK"
-        >
-          {displayed}
-          {!done && startTyping && (
-            <span className="animate-pulse" style={{ opacity: 1 }}>
-              ▌
+        {/* Badge terminal HAKICK.SYS */}
+        <div className="flex items-center justify-center mb-8">
+          <div
+            className="inline-flex items-center gap-2 rounded-full px-4 py-1.5"
+            style={{
+              backgroundColor: "var(--cyber-bg-secondary)",
+              border: "1px solid var(--cyber-border)",
+            }}
+          >
+            <div className="flex items-center gap-1">
+              <span
+                className="block w-2 h-2 rounded-full"
+                style={{ backgroundColor: "#ff3e3e" }}
+              />
+              <span
+                className="block w-2 h-2 rounded-full"
+                style={{ backgroundColor: "#ffbd2e" }}
+              />
+              <span
+                className="block w-2 h-2 rounded-full"
+                style={{ backgroundColor: "#27c93f" }}
+              />
+            </div>
+            <span
+              className="font-mono text-xs"
+              style={{ color: "var(--cyber-text-secondary)" }}
+            >
+              HAKICK.SYS
             </span>
-          )}
+            <div className="flex items-center gap-1">
+              <span
+                className="block w-2 h-2 rounded-full"
+                style={{ backgroundColor: "#ff3e3e" }}
+              />
+              <span
+                className="block w-2 h-2 rounded-full"
+                style={{ backgroundColor: "#ffbd2e" }}
+              />
+              <span
+                className="block w-2 h-2 rounded-full"
+                style={{ backgroundColor: "#27c93f" }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* ASCII Art HACK */}
+        <pre
+          className="font-mono text-[0.6rem] sm:text-xs md:text-sm lg:text-base leading-none mb-6 select-none whitespace-pre"
+          style={{
+            color: "var(--cyber-accent-green)",
+            textShadow: "0 0 20px rgba(0, 255, 65, 0.3)",
+          }}
+          aria-label="HACK"
+        >
+          {asciiText}
         </pre>
 
-        <GlitchText
-          text={profile.pseudo}
-          as="h1"
-          intensity="medium"
-          className="text-5xl md:text-7xl lg:text-8xl font-bold font-mono tracking-tight text-glow-green"
-          style={{ color: "var(--cyber-accent-green)" }}
-        />
-
-        <p
-          className="mt-4 text-lg md:text-xl lg:text-2xl font-medium"
-          style={{ color: "var(--cyber-text-primary)" }}
+        {/* Titre gradient */}
+        <h1
+          className="mt-6 text-xl md:text-2xl lg:text-3xl font-semibold font-sans"
+          style={{
+            background: "linear-gradient(90deg, #00ff41, #b44aff)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
         >
-          {lang === "en" && profile.titreEn ? profile.titreEn : profile.titre}
-        </p>
+          {titre}
+        </h1>
 
+        {/* Bio courte */}
         <p
-          className="mt-2 text-sm md:text-base font-mono tracking-wider"
-          style={{ color: "var(--cyber-accent-blue)" }}
-        >
-          {lang === "en" && profile.sousTitreEn
-            ? profile.sousTitreEn
-            : profile.sousTitre}
-        </p>
-
-        <p
-          className="mt-6 text-sm md:text-base max-w-xl mx-auto leading-relaxed"
+          className="mt-4 text-sm md:text-base max-w-2xl mx-auto leading-relaxed"
           style={{ color: "var(--cyber-text-secondary)" }}
         >
-          {getShortBio(
-            lang === "en" && profile.bioEn ? profile.bioEn : profile.bio,
-          )}
+          {bio}
         </p>
 
-        <div className="mt-8">
-          <CyberButton variant="primary" size="lg" href="#about">
-            {lang === "en" ? "Explore my profile" : "Explorer mon profil"}
+        {/* Deux boutons CTA */}
+        <div className="flex items-center justify-center gap-4 mt-8 flex-col sm:flex-row">
+          <CyberButton
+            variant="filled"
+            href="#about"
+            className="w-full sm:w-auto"
+          >
+            {lang === "en"
+              ? "\u2726 Explore my profile >"
+              : "\u2726 D\u00e9couvrir mon profil >"}
           </CyberButton>
+          <CyberButton
+            variant="secondary"
+            href="#terminal"
+            className="w-full sm:w-auto"
+          >
+            {">_ Terminal"}
+          </CyberButton>
+        </div>
+
+        {/* Trois badges spécialité */}
+        <div className="flex items-center justify-center gap-3 mt-6 flex-wrap">
+          <div
+            className="flex items-center gap-2 rounded-full px-4 py-2 text-xs"
+            style={{
+              border: "1px solid var(--cyber-border)",
+              color: "var(--cyber-text-secondary)",
+            }}
+          >
+            <span
+              className="font-mono"
+              style={{ color: "var(--cyber-accent-blue)" }}
+            >
+              {"</>"}
+            </span>
+            <span className="font-sans">Cloud Computing</span>
+          </div>
+          <div
+            className="flex items-center gap-2 rounded-full px-4 py-2 text-xs"
+            style={{
+              border: "1px solid var(--cyber-border)",
+              color: "var(--cyber-text-secondary)",
+            }}
+          >
+            <span
+              className="font-mono"
+              style={{ color: "var(--cyber-accent-green)" }}
+            >
+              {"\ud83d\udee1"}
+            </span>
+            <span className="font-sans">
+              {lang === "en" ? "Cybersecurity" : "Cybers\u00e9curit\u00e9"}
+            </span>
+          </div>
+          <div
+            className="flex items-center gap-2 rounded-full px-4 py-2 text-xs"
+            style={{
+              border: "1px solid var(--cyber-border)",
+              color: "var(--cyber-text-secondary)",
+            }}
+          >
+            <span
+              className="font-mono"
+              style={{ color: "var(--cyber-accent-purple)" }}
+            >
+              {"{}"}
+            </span>
+            <span className="font-sans">
+              {lang === "en" ? "Generative AI" : "IA G\u00e9n\u00e9rative"}
+            </span>
+          </div>
         </div>
       </div>
     </section>
