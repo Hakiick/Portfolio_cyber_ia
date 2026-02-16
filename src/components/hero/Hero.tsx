@@ -158,14 +158,17 @@ export function Hero() {
             }}
           >
             <div
-              className="w-full h-full rounded-full overflow-hidden"
+              className="relative w-full h-full rounded-full overflow-hidden"
               style={{ backgroundColor: "var(--cyber-bg-secondary)" }}
             >
               <img
                 src="/at-work.jpg"
                 alt="Hakick — Maxime"
-                className="w-full h-full object-cover rounded-full"
-                style={{ display: photoLoaded ? "block" : "none" }}
+                className="absolute inset-0 w-full h-full object-cover rounded-full"
+                style={{
+                  opacity: photoLoaded ? 1 : 0,
+                  transition: "opacity 0.3s ease",
+                }}
                 onLoad={() => setPhotoLoaded(true)}
                 onError={() => setPhotoLoaded(false)}
               />
