@@ -430,6 +430,7 @@ function RadarChart({
     <svg
       viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
       className="w-full max-w-[300px] md:max-w-[360px] mx-auto"
+      style={{ overflow: "visible" }}
       aria-label="Radar chart des compétences"
       role="img"
     >
@@ -547,7 +548,8 @@ export function Skills() {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
             {/* Radar Chart */}
             <div
-              className="flex-shrink-0 w-full md:w-1/2"
+              className="flex-shrink-0 w-full md:w-1/2 pt-4"
+              style={{ overflow: "visible" }}
               onMouseLeave={handleLeave}
             >
               <RadarChart
