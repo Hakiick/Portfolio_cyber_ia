@@ -26,10 +26,10 @@ export function ShowcaseCards() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16 max-w-4xl mx-auto px-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16 max-w-3xl mx-auto px-4">
       {/* Card 1 — IA Brain */}
       <div
-        className="rounded-xl overflow-hidden h-48 md:h-72 flex flex-col"
+        className="rounded-xl overflow-hidden h-40 md:h-56 flex flex-col"
         style={{
           backgroundColor: "var(--cyber-bg-secondary)",
           border: "1px solid var(--cyber-border)",
@@ -62,7 +62,7 @@ export function ShowcaseCards() {
 
       {/* Card 2 — Hack Flag */}
       <div
-        className="rounded-xl overflow-hidden h-48 md:h-72 flex flex-col"
+        className="rounded-xl overflow-hidden h-40 md:h-56 flex flex-col"
         style={{
           backgroundColor: "var(--cyber-bg-secondary)",
           border: "1px solid var(--cyber-border)",

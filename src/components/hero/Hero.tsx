@@ -272,7 +272,7 @@ export function Hero() {
               className="font-mono"
               style={{ color: "var(--cyber-accent-blue)" }}
             >
-              {"</>"}
+              {"\u2601\ufe0f"}
             </span>
             <span className="font-sans">Cloud Computing</span>
           </div>
@@ -304,7 +304,7 @@ export function Hero() {
               className="font-mono"
               style={{ color: "var(--cyber-accent-purple)" }}
             >
-              {"{}"}
+              {"\ud83e\udde0"}
             </span>
             <span className="font-sans">
               {lang === "en" ? "Generative AI" : "IA G\u00e9n\u00e9rative"}
