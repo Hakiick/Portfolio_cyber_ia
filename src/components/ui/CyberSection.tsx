@@ -67,7 +67,16 @@ export function CyberSection({
   }, [prefersReduced]);
 
   return (
-    <section ref={sectionRef} id={id} className={cn(sectionStyles, className)}>
+    <section
+      ref={sectionRef}
+      id={id}
+      className={cn(sectionStyles, className)}
+      style={{
+        position: "relative",
+        zIndex: 1,
+        backgroundColor: "var(--cyber-bg-primary)",
+      }}
+    >
       <h2
         className={titleStyles}
         style={{

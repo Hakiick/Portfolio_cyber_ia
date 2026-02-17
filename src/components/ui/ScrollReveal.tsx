@@ -16,15 +16,15 @@ const hiddenStyles: Record<ScrollAnimation, CSSProperties> = {
   },
   "slide-up": {
     opacity: 0,
-    transform: "translateY(30px)",
+    transform: "translateY(20px)",
   },
   "slide-left": {
     opacity: 0,
-    transform: "translateX(-30px)",
+    transform: "translateX(-20px)",
   },
   "slide-right": {
     opacity: 0,
-    transform: "translateX(30px)",
+    transform: "translateX(20px)",
   },
 };
 
