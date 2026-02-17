@@ -16,15 +16,15 @@ const hiddenStyles: Record<ScrollAnimation, CSSProperties> = {
   },
   "slide-up": {
     opacity: 0,
-    transform: "translateY(30px)",
+    transform: "translateY(20px)",
   },
   "slide-left": {
     opacity: 0,
-    transform: "translateX(-30px)",
+    transform: "translateX(-20px)",
   },
   "slide-right": {
     opacity: 0,
-    transform: "translateX(30px)",
+    transform: "translateX(20px)",
   },
 };
 
@@ -39,7 +39,7 @@ export function ScrollReveal({
   delay = 0,
   className,
 }: ScrollRevealProps) {
-  const { ref, isVisible } = useScrollReveal({ threshold: 0.15 });
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.05 });
 
   const style: CSSProperties = {
     ...(isVisible ? visibleStyle : hiddenStyles[animation]),

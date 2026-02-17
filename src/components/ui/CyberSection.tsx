@@ -14,13 +14,13 @@ export interface CyberSectionProps {
 const sectionStyles = [
   "w-full",
   "max-w-5xl mx-auto",
-  "px-4 py-12 md:px-6 md:py-20 lg:px-8 lg:py-24",
+  "px-4 py-4 md:px-6 md:py-6 lg:px-8 lg:py-8",
 ].join(" ");
 
 const titleStyles = [
   "font-mono text-[var(--cyber-accent-green)]",
   "text-lg md:text-xl lg:text-2xl",
-  "font-bold mb-8 md:mb-12",
+  "font-bold mb-4 md:mb-6",
   "text-glow-green",
 ].join(" ");
 
@@ -58,7 +58,8 @@ export function CyberSection({
       const center = rect.top + rect.height / 2;
       const viewCenter = window.innerHeight / 2;
       const diff = center - viewCenter;
-      setOffset(diff * PARALLAX_FACTOR);
+      const raw = diff * PARALLAX_FACTOR;
+      setOffset(Math.max(-15, Math.min(15, raw)));
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -67,7 +68,16 @@ export function CyberSection({
   }, [prefersReduced]);
 
   return (
-    <section ref={sectionRef} id={id} className={cn(sectionStyles, className)}>
+    <section
+      ref={sectionRef}
+      id={id}
+      className={cn(sectionStyles, className)}
+      style={{
+        position: "relative",
+        zIndex: 1,
+        backgroundColor: "rgba(10, 10, 15, 0.85)",
+      }}
+    >
       <h2
         className={titleStyles}
         style={{

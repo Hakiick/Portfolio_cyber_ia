@@ -1,11 +1,9 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { CyberSection } from "../ui/CyberSection";
-import { ScrollReveal } from "../ui/ScrollReveal";
-import { SkillTree } from "./SkillTree";
 import { skills, type SkillCategory } from "../../data/skills";
 import { useLanguage } from "../../lib/useLanguage";
 
-const CHART_SIZE = 300;
+const CHART_SIZE = 360;
 const CENTER = CHART_SIZE / 2;
 const RADIUS = 120;
 const GRID_LEVELS = [0.25, 0.5, 0.75, 1.0];
@@ -62,15 +60,7 @@ function GridLines() {
   );
 }
 
-function AxisLines({
-  hoveredIndex,
-  onHover,
-  onLeave,
-}: {
-  hoveredIndex: number | null;
-  onHover: (index: number) => void;
-  onLeave: () => void;
-}) {
+function VisibleAxisLines({ hoveredIndex }: { hoveredIndex: number | null }) {
   return (
     <>
       {skills.map((_, i) => {
@@ -90,13 +80,28 @@ function AxisLines({
             }
             strokeWidth={isHovered ? 2 : 1}
             opacity={isHovered ? 0.9 : 0.4}
+            className="pointer-events-none"
           />
         );
       })}
-      {/* Invisible hit areas for hover */}
+    </>
+  );
+}
+
+function HitAreas({
+  onHover,
+  onLeave,
+  onClick,
+}: {
+  onHover: (index: number) => void;
+  onLeave: () => void;
+  onClick: (index: number) => void;
+}) {
+  return (
+    <>
       {skills.map((_, i) => {
         const angle = getAxisAngle(i);
-        const { x, y } = polarToCartesian(angle, RADIUS + 20);
+        const { x, y } = polarToCartesian(angle, RADIUS + 40);
 
         return (
           <line
@@ -113,14 +118,13 @@ function AxisLines({
             aria-label={`Compétence : ${skills[i].label}`}
             onMouseEnter={() => onHover(i)}
             onMouseLeave={onLeave}
-            onClick={() => onHover(i)}
+            onClick={() => onClick(i)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                onHover(i);
+                onClick(i);
               }
             }}
-            onBlur={onLeave}
           />
         );
       })}
@@ -130,11 +134,13 @@ function AxisLines({
 
 function AxisLabels({
   hoveredIndex,
-  onHover,
+  onClick,
 }: {
   hoveredIndex: number | null;
-  onHover: (index: number) => void;
+  onClick: (index: number) => void;
 }) {
+  const { lang } = useLanguage();
+
   return (
     <>
       {skills.map((cat, i) => {
@@ -147,6 +153,10 @@ function AxisLabels({
         else if (x > CENTER + 10) textAnchor = "start";
 
         const dy = y < CENTER - 10 ? -6 : y > CENTER + 10 ? 14 : 4;
+
+        const fullLabel =
+          lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
+        const shortLabel = fullLabel.split("/")[0].trim();
 
         return (
           <text
@@ -162,14 +172,15 @@ function AxisLabels({
             }
             fontSize={11}
             fontWeight={isHovered ? 700 : 400}
+            opacity={isHovered ? 1 : 0.85}
             style={
               isHovered
                 ? { filter: "drop-shadow(0 0 6px rgba(0,255,65,0.5))" }
                 : undefined
             }
-            onMouseEnter={() => onHover(i)}
+            onClick={() => onClick(i)}
           >
-            {cat.label}
+            {shortLabel} {cat.level}%
           </text>
         );
       })}
@@ -189,6 +200,7 @@ function DataPolygon({ scale }: { scale: number }) {
       stroke="var(--cyber-accent-green)"
       strokeWidth={2}
       strokeOpacity={0.8}
+      className="pointer-events-none"
       style={{
         filter: "drop-shadow(0 0 8px rgba(0,255,65,0.3))",
         transition: "all 0.3s ease-out",
@@ -213,20 +225,33 @@ function DataPoints({
         const isHovered = hoveredIndex === i;
 
         return (
-          <circle
-            key={cat.id}
-            cx={x}
-            cy={y}
-            r={isHovered ? 5 : 3}
-            fill="var(--cyber-accent-green)"
-            stroke="var(--cyber-bg-primary)"
-            strokeWidth={1.5}
-            style={
-              isHovered
-                ? { filter: "drop-shadow(0 0 8px rgba(0,255,65,0.6))" }
-                : undefined
-            }
-          />
+          <g key={cat.id} className="pointer-events-none">
+            <circle
+              cx={x}
+              cy={y}
+              r={isHovered ? 5 : 3}
+              fill="var(--cyber-accent-green)"
+              stroke="var(--cyber-bg-primary)"
+              strokeWidth={1.5}
+              style={
+                isHovered
+                  ? { filter: "drop-shadow(0 0 8px rgba(0,255,65,0.6))" }
+                  : undefined
+              }
+            />
+            {isHovered && (
+              <text
+                x={x}
+                y={y - 10}
+                textAnchor="middle"
+                fill="var(--cyber-text-secondary)"
+                fontSize={9}
+                className="font-mono"
+              >
+                {cat.level}%
+              </text>
+            )}
+          </g>
         );
       })}
     </>
@@ -392,37 +417,37 @@ function RadarChart({
   hoveredIndex,
   onHover,
   onLeave,
+  onClick,
 }: {
   scale: number;
   hoveredIndex: number | null;
   onHover: (index: number) => void;
   onLeave: () => void;
+  onClick: (index: number) => void;
 }) {
   return (
     <svg
       viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
       className="w-full max-w-[300px] md:max-w-[360px] mx-auto"
+      style={{ overflow: "visible" }}
       aria-label="Radar chart des compétences"
       role="img"
     >
       <GridLines />
-      <AxisLines
-        hoveredIndex={hoveredIndex}
-        onHover={onHover}
-        onLeave={onLeave}
-      />
+      <VisibleAxisLines hoveredIndex={hoveredIndex} />
       <DataPolygon scale={scale} />
       <DataPoints scale={scale} hoveredIndex={hoveredIndex} />
-      <AxisLabels hoveredIndex={hoveredIndex} onHover={onHover} />
+      <AxisLabels hoveredIndex={hoveredIndex} onClick={onClick} />
+      <HitAreas onHover={onHover} onLeave={onLeave} onClick={onClick} />
     </svg>
   );
 }
 
 function SkillCategoryButtons({
-  hoveredIndex,
+  selectedIndex,
   onSelect,
 }: {
-  hoveredIndex: number | null;
+  selectedIndex: number | null;
   onSelect: (index: number) => void;
 }) {
   const { lang } = useLanguage();
@@ -430,7 +455,7 @@ function SkillCategoryButtons({
   return (
     <div className="flex flex-wrap justify-center gap-2 mt-6 md:hidden">
       {skills.map((cat, i) => {
-        const isActive = hoveredIndex === i;
+        const isActive = selectedIndex === i;
         const label = lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
         return (
           <button
@@ -457,13 +482,11 @@ function SkillCategoryButtons({
   );
 }
 
-type SkillView = "radar" | "tree";
-
 export function Skills() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [scale, setScale] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [view, setView] = useState<SkillView>("radar");
   const sectionRef = useRef<HTMLDivElement>(null);
   const { lang } = useLanguage();
 
@@ -475,8 +498,8 @@ export function Skills() {
     setHoveredIndex(null);
   }, []);
 
-  const handleMobileSelect = useCallback((index: number) => {
-    setHoveredIndex((prev) => (prev === index ? null : index));
+  const handleClick = useCallback((index: number) => {
+    setSelectedIndex((prev) => (prev === index ? null : index));
   }, []);
 
   useEffect(() => {
@@ -511,109 +534,102 @@ export function Skills() {
     return () => observer.disconnect();
   }, [isVisible]);
 
+  const activeIndex = selectedIndex ?? hoveredIndex;
   const activeCategory = useMemo(
-    () => (hoveredIndex !== null ? skills[hoveredIndex] : null),
-    [hoveredIndex],
+    () => (activeIndex !== null ? skills[activeIndex] : null),
+    [activeIndex],
   );
 
   return (
     <CyberSection id="skills" title="section.skills">
       <div ref={sectionRef}>
-        {/* View Toggle */}
-        <div className="flex justify-center mb-6">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
+          {/* Radar Chart */}
           <div
-            className="inline-flex rounded border font-mono text-xs"
-            style={{ borderColor: "var(--cyber-border)" }}
+            className="flex-shrink-0 w-full md:w-1/2 pt-4"
+            style={{ overflow: "visible" }}
+            onMouseLeave={handleLeave}
           >
-            <button
-              onClick={() => setView("radar")}
-              className="px-3 py-1.5 transition-colors duration-200"
-              style={{
-                backgroundColor:
-                  view === "radar"
-                    ? "rgba(0,255,65,0.1)"
-                    : "var(--cyber-bg-secondary)",
-                color:
-                  view === "radar"
-                    ? "var(--cyber-accent-green)"
-                    : "var(--cyber-text-secondary)",
-                borderRight: "1px solid var(--cyber-border)",
-              }}
-            >
-              {lang === "en" ? "Radar" : "Radar"}
-            </button>
-            <button
-              onClick={() => setView("tree")}
-              className="px-3 py-1.5 transition-colors duration-200"
-              style={{
-                backgroundColor:
-                  view === "tree"
-                    ? "rgba(0,255,65,0.1)"
-                    : "var(--cyber-bg-secondary)",
-                color:
-                  view === "tree"
-                    ? "var(--cyber-accent-green)"
-                    : "var(--cyber-text-secondary)",
-              }}
-            >
-              {lang === "en" ? "Skill Tree" : "Skill Tree"}
-            </button>
+            <RadarChart
+              scale={scale}
+              hoveredIndex={activeIndex}
+              onHover={handleHover}
+              onLeave={handleLeave}
+              onClick={handleClick}
+            />
+            <SkillCategoryButtons
+              selectedIndex={selectedIndex}
+              onSelect={handleClick}
+            />
+          </div>
+
+          {/* Detail Panel */}
+          <div className="w-full md:w-1/2 min-h-[200px]">
+            {activeCategory ? (
+              <SkillDetailPanel category={activeCategory} />
+            ) : (
+              <div
+                className="p-4 md:p-5 rounded-md border font-mono"
+                style={{
+                  backgroundColor: "var(--cyber-bg-secondary)",
+                  borderColor: "var(--cyber-border)",
+                }}
+              >
+                <p
+                  className="text-xs mb-4"
+                  style={{ color: "var(--cyber-text-secondary)" }}
+                >
+                  {lang === "en"
+                    ? "Select a domain to explore sub-skills"
+                    : "Sélectionnez un domaine pour explorer les sous-compétences"}
+                </p>
+                <ul className="space-y-3">
+                  {skills.map((cat, i) => {
+                    const label =
+                      lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
+                    return (
+                      <li
+                        key={cat.id}
+                        className="cursor-pointer"
+                        onClick={() => handleClick(i)}
+                      >
+                        <div className="flex justify-between text-xs mb-1">
+                          <span style={{ color: "var(--cyber-text-primary)" }}>
+                            {label}
+                          </span>
+                          <span
+                            style={{ color: "var(--cyber-text-secondary)" }}
+                          >
+                            {cat.level}%
+                          </span>
+                        </div>
+                        <div
+                          className="w-full h-1.5 rounded-full overflow-hidden"
+                          style={{ backgroundColor: "var(--cyber-border)" }}
+                        >
+                          <div
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${cat.level}%`,
+                              backgroundColor:
+                                cat.level >= 80
+                                  ? "var(--cyber-accent-green)"
+                                  : "var(--cyber-accent-blue)",
+                              boxShadow:
+                                cat.level >= 80
+                                  ? "0 0 8px rgba(0,255,65,0.4)"
+                                  : "0 0 8px rgba(0,212,255,0.4)",
+                            }}
+                          />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
-
-        <ScrollReveal animation="fade-in">
-          {view === "radar" ? (
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
-              {/* Radar Chart */}
-              <div
-                className="flex-shrink-0 w-full md:w-1/2"
-                onMouseLeave={handleLeave}
-              >
-                <RadarChart
-                  scale={scale}
-                  hoveredIndex={hoveredIndex}
-                  onHover={handleHover}
-                  onLeave={handleLeave}
-                />
-                <SkillCategoryButtons
-                  hoveredIndex={hoveredIndex}
-                  onSelect={handleMobileSelect}
-                />
-              </div>
-
-              {/* Detail Panel */}
-              <div className="w-full md:w-1/2 min-h-[200px]">
-                {activeCategory ? (
-                  <SkillDetailPanel category={activeCategory} />
-                ) : (
-                  <div
-                    className="flex items-center justify-center h-full min-h-[200px] rounded-md border border-dashed p-6"
-                    style={{
-                      borderColor: "var(--cyber-border)",
-                      color: "var(--cyber-text-secondary)",
-                    }}
-                  >
-                    <p className="font-mono text-sm text-center">
-                      <span
-                        className="block mb-2 text-base"
-                        style={{ color: "var(--cyber-accent-green)" }}
-                      >
-                        [ ]
-                      </span>
-                      {lang === "en"
-                        ? "Hover an axis to see details"
-                        : "Survolez un axe du radar"}
-                      <br />
-                      {lang === "en" ? "" : "pour voir le detail"}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <SkillTree />
-          )}
-        </ScrollReveal>
       </div>
     </CyberSection>
   );

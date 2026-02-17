@@ -4,7 +4,6 @@ import Nav from "../components/nav/Nav";
 import BootSequence from "../components/boot/BootSequence";
 import Brain3D from "../components/brain/Brain3D";
 import Hero from "../components/hero/Hero";
-import About from "../components/about/About";
 import Skills from "../components/skills/Skills";
 import Projects from "../components/projects/Projects";
 import Certifications from "../components/certifications/Certifications";
@@ -31,11 +30,9 @@ const title = "Hakick — AI Security Engineer | Portfolio";
     <Brain3D client:idle />
     <Hero client:load />
     <SectionDivider />
-    <About client:load />
-    <SectionDivider />
     <Skills client:visible />
     <SectionDivider />
-    <div class="relative">
+    <div class="relative" style="z-index: 1;">
       <CodeRain client:idle />
       <Projects client:visible />
       <SectionDivider />

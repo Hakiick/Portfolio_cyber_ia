@@ -4,12 +4,13 @@ import { Stars, AdaptiveDpr } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
 
-const NODE_COUNT = 60;
+const NODE_COUNT = 70;
 const NODE_RADIUS = 0.15;
 const CONNECTION_DISTANCE = 3.5;
 const MOUSE_INFLUENCE_RADIUS = 4.0;
-const SCROLL_ROTATION_FACTOR = 0.0003;
-const SPREAD = 8;
+const SCROLL_ROTATION_FACTOR = 0.0006;
+const SPREAD = 9;
+const BASE_ROTATION_SPEED = 0.08;
 
 interface NodeData {
   basePositions: Float32Array;
@@ -26,9 +27,9 @@ function generateNodes(count: number): NodeData {
     basePositions[i3 + 1] = (Math.random() - 0.5) * SPREAD;
     basePositions[i3 + 2] = (Math.random() - 0.5) * SPREAD * 0.6;
 
-    velocities[i3] = (Math.random() - 0.5) * 0.003;
-    velocities[i3 + 1] = (Math.random() - 0.5) * 0.003;
-    velocities[i3 + 2] = (Math.random() - 0.5) * 0.002;
+    velocities[i3] = (Math.random() - 0.5) * 0.008;
+    velocities[i3 + 1] = (Math.random() - 0.5) * 0.008;
+    velocities[i3 + 2] = (Math.random() - 0.5) * 0.005;
   }
 
   return { basePositions, velocities };
@@ -148,13 +149,16 @@ function NeuralNetwork({ isVisible }: NeuralNetworkProps) {
     for (let i = 0; i < NODE_COUNT; i++) {
       const i3 = i * 3;
       currentPositions[i3] =
-        basePositions[i3] + Math.sin(time * velocities[i3] * 100 + i) * 0.3;
+        basePositions[i3] +
+        Math.sin(time * velocities[i3] * 100 + i) * 0.7 +
+        Math.sin(time * 0.3 + i * 0.5) * 0.15;
       currentPositions[i3 + 1] =
         basePositions[i3 + 1] +
-        Math.cos(time * velocities[i3 + 1] * 100 + i * 0.7) * 0.3;
+        Math.cos(time * velocities[i3 + 1] * 100 + i * 0.7) * 0.7 +
+        Math.cos(time * 0.25 + i * 0.3) * 0.15;
       currentPositions[i3 + 2] =
         basePositions[i3 + 2] +
-        Math.sin(time * velocities[i3 + 2] * 100 + i * 1.3) * 0.2;
+        Math.sin(time * velocities[i3 + 2] * 100 + i * 1.3) * 0.45;
     }
 
     const pointsPosAttr = pointsRef.current.geometry.attributes
@@ -236,8 +240,10 @@ function NeuralNetwork({ isVisible }: NeuralNetworkProps) {
     }
     lineColorAttr.needsUpdate = true;
 
-    groupRef.current.rotation.y = scrollYRef.current * SCROLL_ROTATION_FACTOR;
+    groupRef.current.rotation.y =
+      time * BASE_ROTATION_SPEED + scrollYRef.current * SCROLL_ROTATION_FACTOR;
     groupRef.current.rotation.x =
+      Math.sin(time * 0.05) * 0.1 +
       scrollYRef.current * SCROLL_ROTATION_FACTOR * 0.3;
   });
 
@@ -272,7 +278,7 @@ function NeuralNetwork({ isVisible }: NeuralNetworkProps) {
         <lineBasicMaterial
           vertexColors
           transparent
-          opacity={0.15}
+          opacity={0.25}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
