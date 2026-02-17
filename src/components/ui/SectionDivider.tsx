@@ -1,10 +1,10 @@
 export function SectionDivider() {
   return (
     <div
-      className="relative w-full overflow-hidden py-8 md:py-12 lg:py-16"
+      className="relative w-full overflow-hidden py-2 md:py-4"
       style={{
         zIndex: 1,
-        backgroundColor: "var(--cyber-bg-primary)",
+        backgroundColor: "rgba(10, 10, 15, 0.7)",
       }}
       aria-hidden="true"
     >

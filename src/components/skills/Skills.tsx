@@ -4,7 +4,7 @@ import { ScrollReveal } from "../ui/ScrollReveal";
 import { skills, type SkillCategory } from "../../data/skills";
 import { useLanguage } from "../../lib/useLanguage";
 
-const CHART_SIZE = 300;
+const CHART_SIZE = 360;
 const CENTER = CHART_SIZE / 2;
 const RADIUS = 120;
 const GRID_LEVELS = [0.25, 0.5, 0.75, 1.0];
@@ -155,7 +155,9 @@ function AxisLabels({
 
         const dy = y < CENTER - 10 ? -6 : y > CENTER + 10 ? 14 : 4;
 
-        const label = lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
+        const fullLabel =
+          lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
+        const shortLabel = fullLabel.split("/")[0].trim();
 
         return (
           <text
@@ -171,6 +173,7 @@ function AxisLabels({
             }
             fontSize={11}
             fontWeight={isHovered ? 700 : 400}
+            opacity={isHovered ? 1 : 0.85}
             style={
               isHovered
                 ? { filter: "drop-shadow(0 0 6px rgba(0,255,65,0.5))" }
@@ -178,7 +181,7 @@ function AxisLabels({
             }
             onClick={() => onClick(i)}
           >
-            {label}
+            {shortLabel} {cat.level}%
           </text>
         );
       })}

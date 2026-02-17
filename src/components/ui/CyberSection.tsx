@@ -14,7 +14,7 @@ export interface CyberSectionProps {
 const sectionStyles = [
   "w-full",
   "max-w-5xl mx-auto",
-  "px-4 py-12 md:px-6 md:py-20 lg:px-8 lg:py-24",
+  "px-4 py-8 md:px-6 md:py-12 lg:px-8 lg:py-16",
 ].join(" ");
 
 const titleStyles = [
@@ -74,7 +74,7 @@ export function CyberSection({
       style={{
         position: "relative",
         zIndex: 1,
-        backgroundColor: "var(--cyber-bg-primary)",
+        backgroundColor: "rgba(10, 10, 15, 0.85)",
       }}
     >
       <h2

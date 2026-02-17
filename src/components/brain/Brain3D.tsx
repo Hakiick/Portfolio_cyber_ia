@@ -1,15 +1,8 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  lazy,
-  Suspense,
-} from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 
 const Brain3DScene = lazy(() => import("./Brain3DScene"));
 
-const CANVAS_OPACITY = 0.35;
+const CANVAS_OPACITY = 0.4;
 
 function isWebGLAvailable(): boolean {
   try {
@@ -49,27 +42,9 @@ export function Brain3D() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleVisibility = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const anyVisible = entries.some((entry) => entry.isIntersecting);
-      setIsVisible(anyVisible);
-    },
-    [],
-  );
-
   useEffect(() => {
-    const heroSection = document.getElementById("hero");
-    const aboutSection = document.getElementById("about");
-
-    const observer = new IntersectionObserver(handleVisibility, {
-      threshold: 0,
-    });
-
-    if (heroSection) observer.observe(heroSection);
-    if (aboutSection) observer.observe(aboutSection);
-
-    return () => observer.disconnect();
-  }, [handleVisibility]);
+    setIsVisible(true);
+  }, []);
 
   if (isMobile || !webglSupported) {
     return (
