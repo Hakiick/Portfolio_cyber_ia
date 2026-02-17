@@ -39,6 +39,7 @@ function CertificationCard({
   description,
   descriptionEn,
   progress,
+  image,
 }: {
   nom: string;
   organisme: string;
@@ -46,6 +47,7 @@ function CertificationCard({
   description: string;
   descriptionEn?: string;
   progress: number;
+  image: string;
 }) {
   const { lang } = useLanguage();
   const statusConfig = useStatusConfig();
@@ -58,7 +60,7 @@ function CertificationCard({
   return (
     <div
       className="cert-flip-container cursor-pointer"
-      style={{ perspective: "1000px", height: "180px" }}
+      style={{ perspective: "1000px", height: "190px" }}
       onClick={() => setIsFlipped((f) => !f)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -96,12 +98,22 @@ function CertificationCard({
           <div className="p-4 sm:p-5 pl-5 sm:pl-6 h-full flex flex-col justify-between">
             <div>
               <div className="flex items-start justify-between gap-3 mb-2">
-                <h3
-                  className="font-mono font-bold text-base sm:text-lg"
-                  style={{ color: config.color }}
-                >
-                  {nom}
-                </h3>
+                <div className="flex items-center gap-3">
+                  <img
+                    src={image}
+                    alt={nom}
+                    className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex-shrink-0"
+                    style={{
+                      filter: `drop-shadow(0 0 6px ${config.glow})`,
+                    }}
+                  />
+                  <h3
+                    className="font-mono font-bold text-base sm:text-lg"
+                    style={{ color: config.color }}
+                  >
+                    {nom}
+                  </h3>
+                </div>
                 <CyberBadge variant={config.variant}>{config.label}</CyberBadge>
               </div>
 
