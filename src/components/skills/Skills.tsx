@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { CyberSection } from "../ui/CyberSection";
 import { ScrollReveal } from "../ui/ScrollReveal";
+import { CyberBadge } from "../ui/CyberBadge";
 import { SkillTree } from "./SkillTree";
 import { skills, type SkillCategory } from "../../data/skills";
 import { useLanguage } from "../../lib/useLanguage";
 
-const CHART_SIZE = 300;
+const CHART_SIZE = 400;
 const CENTER = CHART_SIZE / 2;
-const RADIUS = 120;
+const RADIUS = 140;
 const GRID_LEVELS = [0.25, 0.5, 0.75, 1.0];
 const AXIS_COUNT = skills.length;
 
@@ -96,7 +97,7 @@ function AxisLines({
       {/* Invisible hit areas for hover */}
       {skills.map((_, i) => {
         const angle = getAxisAngle(i);
-        const { x, y } = polarToCartesian(angle, RADIUS + 20);
+        const { x, y } = polarToCartesian(angle, RADIUS + 40);
 
         return (
           <line
@@ -106,7 +107,7 @@ function AxisLines({
             x2={x}
             y2={y}
             stroke="transparent"
-            strokeWidth={24}
+            strokeWidth={36}
             className="cursor-pointer"
             role="button"
             tabIndex={0}
@@ -135,12 +136,17 @@ function AxisLabels({
   hoveredIndex: number | null;
   onHover: (index: number) => void;
 }) {
+  const { lang } = useLanguage();
+
   return (
     <>
       {skills.map((cat, i) => {
         const angle = getAxisAngle(i);
         const { x, y } = polarToCartesian(angle, RADIUS + 28);
         const isHovered = hoveredIndex === i;
+        const fullLabel =
+          lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
+        const shortLabel = fullLabel.split("/")[0].trim();
 
         let textAnchor: "middle" | "start" | "end" = "middle";
         if (x < CENTER - 10) textAnchor = "end";
@@ -169,7 +175,7 @@ function AxisLabels({
             }
             onMouseEnter={() => onHover(i)}
           >
-            {cat.label}
+            {shortLabel}
           </text>
         );
       })}
@@ -185,13 +191,13 @@ function DataPolygon({ scale }: { scale: number }) {
     <polygon
       points={points}
       fill="var(--cyber-accent-green)"
-      fillOpacity={0.15}
       stroke="var(--cyber-accent-green)"
       strokeWidth={2}
       strokeOpacity={0.8}
       style={{
         filter: "drop-shadow(0 0 8px rgba(0,255,65,0.3))",
         transition: "all 0.3s ease-out",
+        animation: "radar-pulse 3s ease-in-out infinite",
       }}
     />
   );
@@ -213,20 +219,33 @@ function DataPoints({
         const isHovered = hoveredIndex === i;
 
         return (
-          <circle
-            key={cat.id}
-            cx={x}
-            cy={y}
-            r={isHovered ? 5 : 3}
-            fill="var(--cyber-accent-green)"
-            stroke="var(--cyber-bg-primary)"
-            strokeWidth={1.5}
-            style={
-              isHovered
-                ? { filter: "drop-shadow(0 0 8px rgba(0,255,65,0.6))" }
-                : undefined
-            }
-          />
+          <g key={cat.id}>
+            <circle
+              cx={x}
+              cy={y}
+              r={isHovered ? 5 : 3}
+              fill="var(--cyber-accent-green)"
+              stroke="var(--cyber-bg-primary)"
+              strokeWidth={1.5}
+              style={
+                isHovered
+                  ? { filter: "drop-shadow(0 0 8px rgba(0,255,65,0.6))" }
+                  : undefined
+              }
+            />
+            {isHovered && (
+              <text
+                x={x}
+                y={y - 10}
+                textAnchor="middle"
+                fill="var(--cyber-text-secondary)"
+                fontSize={9}
+                className="font-mono pointer-events-none"
+              >
+                {cat.level}%
+              </text>
+            )}
+          </g>
         );
       })}
     </>
@@ -401,7 +420,7 @@ function RadarChart({
   return (
     <svg
       viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
-      className="w-full max-w-[300px] md:max-w-[360px] mx-auto"
+      className="w-full max-w-[340px] md:max-w-[400px] mx-auto"
       aria-label="Radar chart des compétences"
       role="img"
     >
@@ -419,10 +438,10 @@ function RadarChart({
 }
 
 function SkillCategoryButtons({
-  hoveredIndex,
+  selectedIndex,
   onSelect,
 }: {
-  hoveredIndex: number | null;
+  selectedIndex: number | null;
   onSelect: (index: number) => void;
 }) {
   const { lang } = useLanguage();
@@ -430,7 +449,7 @@ function SkillCategoryButtons({
   return (
     <div className="flex flex-wrap justify-center gap-2 mt-6 md:hidden">
       {skills.map((cat, i) => {
-        const isActive = hoveredIndex === i;
+        const isActive = selectedIndex === i;
         const label = lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
         return (
           <button
@@ -461,6 +480,7 @@ type SkillView = "radar" | "tree";
 
 export function Skills() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [scale, setScale] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [view, setView] = useState<SkillView>("radar");
@@ -476,7 +496,7 @@ export function Skills() {
   }, []);
 
   const handleMobileSelect = useCallback((index: number) => {
-    setHoveredIndex((prev) => (prev === index ? null : index));
+    setSelectedIndex((prev) => (prev === index ? null : index));
   }, []);
 
   useEffect(() => {
@@ -511,14 +531,52 @@ export function Skills() {
     return () => observer.disconnect();
   }, [isVisible]);
 
+  const activeIndex = selectedIndex ?? hoveredIndex;
+
   const activeCategory = useMemo(
-    () => (hoveredIndex !== null ? skills[hoveredIndex] : null),
-    [hoveredIndex],
+    () => (activeIndex !== null ? skills[activeIndex] : null),
+    [activeIndex],
   );
+
+  const totalSkills = useMemo(
+    () => skills.reduce((sum, cat) => sum + cat.items.length, 0),
+    [],
+  );
+
+  const avgLevel = useMemo(() => {
+    const sum = skills.reduce((acc, cat) => acc + cat.level, 0);
+    return Math.round(sum / skills.length);
+  }, []);
+
+  const topSkills = useMemo(() => {
+    const allSkills = skills.flatMap((cat) =>
+      cat.items.map((s) => ({
+        name: lang === "en" && s.nameEn ? s.nameEn : s.name,
+        level: s.level,
+      })),
+    );
+    return allSkills.sort((a, b) => b.level - a.level).slice(0, 3);
+  }, [lang]);
 
   return (
     <CyberSection id="skills" title="section.skills">
+      <style>{`
+        @keyframes radar-pulse {
+          0%, 100% { fill-opacity: 0.12; }
+          50% { fill-opacity: 0.20; }
+        }
+      `}</style>
       <div ref={sectionRef}>
+        {/* Stats header */}
+        <div
+          className="text-center mb-4 font-mono text-xs"
+          style={{ color: "var(--cyber-text-secondary)" }}
+        >
+          <span style={{ color: "var(--cyber-accent-green)" }}>&gt;</span>{" "}
+          scan_results: {skills.length} domains | {totalSkills} skills |
+          avg_level: {avgLevel}%
+        </div>
+
         {/* View Toggle */}
         <div className="flex justify-center mb-6">
           <div
@@ -571,14 +629,27 @@ export function Skills() {
               >
                 <RadarChart
                   scale={scale}
-                  hoveredIndex={hoveredIndex}
+                  hoveredIndex={activeIndex}
                   onHover={handleHover}
                   onLeave={handleLeave}
                 />
                 <SkillCategoryButtons
-                  hoveredIndex={hoveredIndex}
+                  selectedIndex={selectedIndex}
                   onSelect={handleMobileSelect}
                 />
+                <div className="flex flex-wrap justify-center gap-2 mt-4">
+                  <span
+                    className="font-mono text-xs"
+                    style={{ color: "var(--cyber-text-secondary)" }}
+                  >
+                    Top skills:
+                  </span>
+                  {topSkills.map((s) => (
+                    <CyberBadge key={s.name} variant="green">
+                      {s.name} {s.level}%
+                    </CyberBadge>
+                  ))}
+                </div>
               </div>
 
               {/* Detail Panel */}
@@ -587,25 +658,67 @@ export function Skills() {
                   <SkillDetailPanel category={activeCategory} />
                 ) : (
                   <div
-                    className="flex items-center justify-center h-full min-h-[200px] rounded-md border border-dashed p-6"
+                    className="p-4 md:p-5 rounded-md border font-mono"
                     style={{
+                      backgroundColor: "var(--cyber-bg-secondary)",
                       borderColor: "var(--cyber-border)",
-                      color: "var(--cyber-text-secondary)",
                     }}
                   >
-                    <p className="font-mono text-sm text-center">
-                      <span
-                        className="block mb-2 text-base"
-                        style={{ color: "var(--cyber-accent-green)" }}
-                      >
-                        [ ]
-                      </span>
+                    <p
+                      className="text-xs mb-4"
+                      style={{ color: "var(--cyber-text-secondary)" }}
+                    >
                       {lang === "en"
-                        ? "Hover an axis to see details"
-                        : "Survolez un axe du radar"}
-                      <br />
-                      {lang === "en" ? "" : "pour voir le detail"}
+                        ? "Select a domain to explore sub-skills"
+                        : "Sélectionnez un domaine pour explorer les sous-compétences"}
                     </p>
+                    <ul className="space-y-3">
+                      {skills.map((cat, i) => {
+                        const label =
+                          lang === "en" && cat.labelEn
+                            ? cat.labelEn
+                            : cat.label;
+                        return (
+                          <li
+                            key={cat.id}
+                            className="cursor-pointer"
+                            onClick={() => handleMobileSelect(i)}
+                          >
+                            <div className="flex justify-between text-xs mb-1">
+                              <span
+                                style={{ color: "var(--cyber-text-primary)" }}
+                              >
+                                {label}
+                              </span>
+                              <span
+                                style={{ color: "var(--cyber-text-secondary)" }}
+                              >
+                                {cat.level}%
+                              </span>
+                            </div>
+                            <div
+                              className="w-full h-1.5 rounded-full overflow-hidden"
+                              style={{ backgroundColor: "var(--cyber-border)" }}
+                            >
+                              <div
+                                className="h-full rounded-full"
+                                style={{
+                                  width: `${cat.level}%`,
+                                  backgroundColor:
+                                    cat.level >= 80
+                                      ? "var(--cyber-accent-green)"
+                                      : "var(--cyber-accent-blue)",
+                                  boxShadow:
+                                    cat.level >= 80
+                                      ? "0 0 8px rgba(0,255,65,0.4)"
+                                      : "0 0 8px rgba(0,212,255,0.4)",
+                                }}
+                              />
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
                 )}
               </div>

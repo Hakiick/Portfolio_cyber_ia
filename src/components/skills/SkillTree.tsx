@@ -156,12 +156,10 @@ export function SkillTree() {
                   y={cy + r + 12}
                   textAnchor="middle"
                   fill="var(--cyber-text-secondary)"
-                  fontSize={8}
+                  fontSize={7}
                   className="font-mono pointer-events-none"
                 >
-                  {skillName.length > 15
-                    ? skillName.slice(0, 14) + "…"
-                    : skillName}
+                  {skillName}
                 </text>
               </g>
             );
@@ -265,6 +263,24 @@ export function SkillTree() {
           ? "Click a node to expand skills"
           : "Cliquez sur un nœud pour voir les compétences"}
       </p>
+      <div className="flex flex-wrap justify-center gap-3 mt-3">
+        {skills.map((cat, i) => {
+          const label = lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
+          return (
+            <div
+              key={cat.id}
+              className="flex items-center gap-1.5 font-mono text-[10px]"
+              style={{ color: "var(--cyber-text-secondary)" }}
+            >
+              <span
+                className="block w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: CATEGORY_COLORS[i] }}
+              />
+              {label.split("/")[0].trim()}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
