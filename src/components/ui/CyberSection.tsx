@@ -58,7 +58,8 @@ export function CyberSection({
       const center = rect.top + rect.height / 2;
       const viewCenter = window.innerHeight / 2;
       const diff = center - viewCenter;
-      setOffset(diff * PARALLAX_FACTOR);
+      const raw = diff * PARALLAX_FACTOR;
+      setOffset(Math.max(-15, Math.min(15, raw)));
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });

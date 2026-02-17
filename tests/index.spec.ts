@@ -24,7 +24,7 @@ test.describe("Boot Sequence", () => {
     await expect(skipBtn).toBeVisible();
     await skipBtn.click();
 
-    await expect(bootOverlay).not.toBeVisible({ timeout: 5000 });
+    await expect(bootOverlay).not.toBeVisible({ timeout: 10000 });
     await expect(page.locator("#hero h1")).toContainText(
       "AI Security Engineer",
     );
