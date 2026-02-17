@@ -39,7 +39,7 @@ export function ScrollReveal({
   delay = 0,
   className,
 }: ScrollRevealProps) {
-  const { ref, isVisible } = useScrollReveal({ threshold: 0.15 });
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.05 });
 
   const style: CSSProperties = {
     ...(isVisible ? visibleStyle : hiddenStyles[animation]),

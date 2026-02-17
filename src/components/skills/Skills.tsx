@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { CyberSection } from "../ui/CyberSection";
-import { ScrollReveal } from "../ui/ScrollReveal";
 import { skills, type SkillCategory } from "../../data/skills";
 import { useLanguage } from "../../lib/useLanguage";
 
@@ -544,97 +543,93 @@ export function Skills() {
   return (
     <CyberSection id="skills" title="section.skills">
       <div ref={sectionRef}>
-        <ScrollReveal animation="fade-in">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
-            {/* Radar Chart */}
-            <div
-              className="flex-shrink-0 w-full md:w-1/2 pt-4"
-              style={{ overflow: "visible" }}
-              onMouseLeave={handleLeave}
-            >
-              <RadarChart
-                scale={scale}
-                hoveredIndex={activeIndex}
-                onHover={handleHover}
-                onLeave={handleLeave}
-                onClick={handleClick}
-              />
-              <SkillCategoryButtons
-                selectedIndex={selectedIndex}
-                onSelect={handleClick}
-              />
-            </div>
-
-            {/* Detail Panel */}
-            <div className="w-full md:w-1/2 min-h-[200px]">
-              {activeCategory ? (
-                <SkillDetailPanel category={activeCategory} />
-              ) : (
-                <div
-                  className="p-4 md:p-5 rounded-md border font-mono"
-                  style={{
-                    backgroundColor: "var(--cyber-bg-secondary)",
-                    borderColor: "var(--cyber-border)",
-                  }}
-                >
-                  <p
-                    className="text-xs mb-4"
-                    style={{ color: "var(--cyber-text-secondary)" }}
-                  >
-                    {lang === "en"
-                      ? "Select a domain to explore sub-skills"
-                      : "Sélectionnez un domaine pour explorer les sous-compétences"}
-                  </p>
-                  <ul className="space-y-3">
-                    {skills.map((cat, i) => {
-                      const label =
-                        lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
-                      return (
-                        <li
-                          key={cat.id}
-                          className="cursor-pointer"
-                          onClick={() => handleClick(i)}
-                        >
-                          <div className="flex justify-between text-xs mb-1">
-                            <span
-                              style={{ color: "var(--cyber-text-primary)" }}
-                            >
-                              {label}
-                            </span>
-                            <span
-                              style={{ color: "var(--cyber-text-secondary)" }}
-                            >
-                              {cat.level}%
-                            </span>
-                          </div>
-                          <div
-                            className="w-full h-1.5 rounded-full overflow-hidden"
-                            style={{ backgroundColor: "var(--cyber-border)" }}
-                          >
-                            <div
-                              className="h-full rounded-full"
-                              style={{
-                                width: `${cat.level}%`,
-                                backgroundColor:
-                                  cat.level >= 80
-                                    ? "var(--cyber-accent-green)"
-                                    : "var(--cyber-accent-blue)",
-                                boxShadow:
-                                  cat.level >= 80
-                                    ? "0 0 8px rgba(0,255,65,0.4)"
-                                    : "0 0 8px rgba(0,212,255,0.4)",
-                              }}
-                            />
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              )}
-            </div>
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
+          {/* Radar Chart */}
+          <div
+            className="flex-shrink-0 w-full md:w-1/2 pt-4"
+            style={{ overflow: "visible" }}
+            onMouseLeave={handleLeave}
+          >
+            <RadarChart
+              scale={scale}
+              hoveredIndex={activeIndex}
+              onHover={handleHover}
+              onLeave={handleLeave}
+              onClick={handleClick}
+            />
+            <SkillCategoryButtons
+              selectedIndex={selectedIndex}
+              onSelect={handleClick}
+            />
           </div>
-        </ScrollReveal>
+
+          {/* Detail Panel */}
+          <div className="w-full md:w-1/2 min-h-[200px]">
+            {activeCategory ? (
+              <SkillDetailPanel category={activeCategory} />
+            ) : (
+              <div
+                className="p-4 md:p-5 rounded-md border font-mono"
+                style={{
+                  backgroundColor: "var(--cyber-bg-secondary)",
+                  borderColor: "var(--cyber-border)",
+                }}
+              >
+                <p
+                  className="text-xs mb-4"
+                  style={{ color: "var(--cyber-text-secondary)" }}
+                >
+                  {lang === "en"
+                    ? "Select a domain to explore sub-skills"
+                    : "Sélectionnez un domaine pour explorer les sous-compétences"}
+                </p>
+                <ul className="space-y-3">
+                  {skills.map((cat, i) => {
+                    const label =
+                      lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
+                    return (
+                      <li
+                        key={cat.id}
+                        className="cursor-pointer"
+                        onClick={() => handleClick(i)}
+                      >
+                        <div className="flex justify-between text-xs mb-1">
+                          <span style={{ color: "var(--cyber-text-primary)" }}>
+                            {label}
+                          </span>
+                          <span
+                            style={{ color: "var(--cyber-text-secondary)" }}
+                          >
+                            {cat.level}%
+                          </span>
+                        </div>
+                        <div
+                          className="w-full h-1.5 rounded-full overflow-hidden"
+                          style={{ backgroundColor: "var(--cyber-border)" }}
+                        >
+                          <div
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${cat.level}%`,
+                              backgroundColor:
+                                cat.level >= 80
+                                  ? "var(--cyber-accent-green)"
+                                  : "var(--cyber-accent-blue)",
+                              boxShadow:
+                                cat.level >= 80
+                                  ? "0 0 8px rgba(0,255,65,0.4)"
+                                  : "0 0 8px rgba(0,212,255,0.4)",
+                            }}
+                          />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </CyberSection>
   );
