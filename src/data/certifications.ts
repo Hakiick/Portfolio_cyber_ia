@@ -7,6 +7,7 @@ export interface Certification {
   description: string;
   descriptionEn?: string;
   progress: number;
+  image: string;
 }
 
 export const certifications: Certification[] = [
@@ -17,6 +18,7 @@ export const certifications: Certification[] = [
     description: "Junior Penetration Tester",
     descriptionEn: "Junior Penetration Tester",
     progress: 100,
+    image: "/images/certs/ejptv2.svg",
   },
   {
     nom: "AZ-900",
@@ -25,14 +27,16 @@ export const certifications: Certification[] = [
     description: "Azure Fundamentals",
     descriptionEn: "Azure Fundamentals",
     progress: 20,
+    image: "/images/certs/az900.svg",
   },
   {
     nom: "AWS Cloud Practitioner",
     organisme: "AWS",
-    status: "preparing",
+    status: "obtained",
     description: "Cloud Fundamentals",
     descriptionEn: "Cloud Fundamentals",
-    progress: 15,
+    progress: 100,
+    image: "/images/certs/aws-cp.svg",
   },
   {
     nom: "AWS AI Practitioner",
@@ -41,5 +45,6 @@ export const certifications: Certification[] = [
     description: "AI/ML Fundamentals",
     descriptionEn: "AI/ML Fundamentals",
     progress: 60,
+    image: "/images/certs/aws-ai.svg",
   },
 ];
