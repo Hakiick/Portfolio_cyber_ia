@@ -1,13 +1,12 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { CyberSection } from "../ui/CyberSection";
 import { ScrollReveal } from "../ui/ScrollReveal";
-import { CyberBadge } from "../ui/CyberBadge";
 import { skills, type SkillCategory } from "../../data/skills";
 import { useLanguage } from "../../lib/useLanguage";
 
-const CHART_SIZE = 400;
+const CHART_SIZE = 300;
 const CENTER = CHART_SIZE / 2;
-const RADIUS = 140;
+const RADIUS = 120;
 const GRID_LEVELS = [0.25, 0.5, 0.75, 1.0];
 const AXIS_COUNT = skills.length;
 
@@ -113,7 +112,7 @@ function HitAreas({
             x2={x}
             y2={y}
             stroke="transparent"
-            strokeWidth={36}
+            strokeWidth={24}
             className="cursor-pointer"
             role="button"
             tabIndex={0}
@@ -149,15 +148,14 @@ function AxisLabels({
         const angle = getAxisAngle(i);
         const { x, y } = polarToCartesian(angle, RADIUS + 28);
         const isHovered = hoveredIndex === i;
-        const fullLabel =
-          lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
-        const shortLabel = fullLabel.split("/")[0].trim();
 
         let textAnchor: "middle" | "start" | "end" = "middle";
         if (x < CENTER - 10) textAnchor = "end";
         else if (x > CENTER + 10) textAnchor = "start";
 
         const dy = y < CENTER - 10 ? -6 : y > CENTER + 10 ? 14 : 4;
+
+        const label = lang === "en" && cat.labelEn ? cat.labelEn : cat.label;
 
         return (
           <text
@@ -180,7 +178,7 @@ function AxisLabels({
             }
             onClick={() => onClick(i)}
           >
-            {shortLabel}
+            {label}
           </text>
         );
       })}
@@ -196,6 +194,7 @@ function DataPolygon({ scale }: { scale: number }) {
     <polygon
       points={points}
       fill="var(--cyber-accent-green)"
+      fillOpacity={0.15}
       stroke="var(--cyber-accent-green)"
       strokeWidth={2}
       strokeOpacity={0.8}
@@ -203,7 +202,6 @@ function DataPolygon({ scale }: { scale: number }) {
       style={{
         filter: "drop-shadow(0 0 8px rgba(0,255,65,0.3))",
         transition: "all 0.3s ease-out",
-        animation: "radar-pulse 3s ease-in-out infinite",
       }}
     />
   );
@@ -428,7 +426,7 @@ function RadarChart({
   return (
     <svg
       viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
-      className="w-full max-w-[340px] md:max-w-[400px] mx-auto"
+      className="w-full max-w-[300px] md:max-w-[360px] mx-auto"
       aria-label="Radar chart des compétences"
       role="img"
     >
@@ -534,51 +532,14 @@ export function Skills() {
   }, [isVisible]);
 
   const activeIndex = selectedIndex ?? hoveredIndex;
-
   const activeCategory = useMemo(
     () => (activeIndex !== null ? skills[activeIndex] : null),
     [activeIndex],
   );
 
-  const totalSkills = useMemo(
-    () => skills.reduce((sum, cat) => sum + cat.items.length, 0),
-    [],
-  );
-
-  const avgLevel = useMemo(() => {
-    const sum = skills.reduce((acc, cat) => acc + cat.level, 0);
-    return Math.round(sum / skills.length);
-  }, []);
-
-  const topSkills = useMemo(() => {
-    const allSkills = skills.flatMap((cat) =>
-      cat.items.map((s) => ({
-        name: lang === "en" && s.nameEn ? s.nameEn : s.name,
-        level: s.level,
-      })),
-    );
-    return allSkills.sort((a, b) => b.level - a.level).slice(0, 3);
-  }, [lang]);
-
   return (
     <CyberSection id="skills" title="section.skills">
-      <style>{`
-        @keyframes radar-pulse {
-          0%, 100% { fill-opacity: 0.12; }
-          50% { fill-opacity: 0.20; }
-        }
-      `}</style>
       <div ref={sectionRef}>
-        {/* Stats header */}
-        <div
-          className="text-center mb-4 font-mono text-xs"
-          style={{ color: "var(--cyber-text-secondary)" }}
-        >
-          <span style={{ color: "var(--cyber-accent-green)" }}>&gt;</span>{" "}
-          scan_results: {skills.length} domains | {totalSkills} skills |
-          avg_level: {avgLevel}%
-        </div>
-
         <ScrollReveal animation="fade-in">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
             {/* Radar Chart */}
@@ -597,19 +558,6 @@ export function Skills() {
                 selectedIndex={selectedIndex}
                 onSelect={handleClick}
               />
-              <div className="flex flex-wrap justify-center gap-2 mt-4">
-                <span
-                  className="font-mono text-xs"
-                  style={{ color: "var(--cyber-text-secondary)" }}
-                >
-                  Top skills:
-                </span>
-                {topSkills.map((s) => (
-                  <CyberBadge key={s.name} variant="green">
-                    {s.name} {s.level}%
-                  </CyberBadge>
-                ))}
-              </div>
             </div>
 
             {/* Detail Panel */}
