@@ -49,7 +49,9 @@ function ScreenshotGallery({ screenshots }: { screenshots: string[] }) {
           alt={`Screenshot ${activeIndex + 1}`}
           loading="lazy"
           onError={() => {
-            const origIndex = screenshots.indexOf(validScreenshots[activeIndex]);
+            const origIndex = screenshots.indexOf(
+              validScreenshots[activeIndex],
+            );
             handleImageError(origIndex);
           }}
           className="h-auto w-full object-cover"
