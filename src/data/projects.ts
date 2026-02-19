@@ -4,7 +4,8 @@ export type ProjectCategory =
   | "ia-cyber"
   | "cloud-iot"
   | "devops"
-  | "ia-meta";
+  | "ia-meta"
+  | "fullstack";
 export type ProjectStatus = "completed" | "in-progress";
 
 export interface Project {
@@ -17,6 +18,8 @@ export interface Project {
   categorie: ProjectCategory;
   status: ProjectStatus;
   github: string;
+  screenshots?: string[];
+  video?: string;
 }
 
 export const projects: Project[] = [
@@ -116,5 +119,48 @@ export const projects: Project[] = [
     categorie: "ia-meta",
     status: "in-progress",
     github: "https://github.com/juninhomax/Portfolio_cyber_ia",
+  },
+  {
+    id: "timemanager",
+    titre: "TimeManager — Gestion du temps de travail",
+    titreEn: "TimeManager — Work Time Management",
+    description:
+      "Application full-stack de gestion des heures de travail : clock in/out, gestion d'équipes, suivi des heures supplémentaires, dashboard admin. Backend Elixir/Phoenix + PostgreSQL, frontend Vue 3 rebuild mobile-first avec animations fluides, PWA offline-first et design responsive. Projet Epitech T-POO-700 avec 275+ commits.",
+    descriptionEn:
+      "Full-stack work time management application: clock in/out, team management, overtime tracking, admin dashboard. Elixir/Phoenix + PostgreSQL backend, Vue 3 frontend rebuilt mobile-first with smooth animations, offline-first PWA and responsive design. Epitech T-POO-700 project with 275+ commits.",
+    stack: [
+      "Vue 3",
+      "TypeScript",
+      "Elixir/Phoenix",
+      "PostgreSQL",
+      "Tailwind CSS",
+      "PWA",
+    ],
+    categorie: "fullstack",
+    status: "completed",
+    github: "https://github.com/Hakiick/T-POO-700-STG_1",
+    video: "/images/projects/timemanager/timemanager-demo.mp4",
+  },
+  {
+    id: "chess-fighter",
+    titre: "Chess Fighter — Jeu d'échecs thématique",
+    titreEn: "Chess Fighter — Themed Chess Game",
+    description:
+      "Jeu d'échecs complet avec des thèmes visuels immersifs (Classic, Marvel, Neon, Pokémon). Animations fluides Framer Motion, responsive mobile-first, effets sonores, confettis de victoire. Projet Epitech construit avec Next.js 14 et orchestré par une architecture multi-agents Claude Code.",
+    descriptionEn:
+      "Full chess game with immersive visual themes (Classic, Marvel, Neon, Pokémon). Smooth Framer Motion animations, mobile-first responsive, sound effects, victory confetti. Epitech project built with Next.js 14 and orchestrated by a Claude Code multi-agent architecture.",
+    stack: [
+      "Next.js 14",
+      "React 18",
+      "TypeScript",
+      "Framer Motion",
+      "Tailwind CSS",
+      "Playwright",
+      "Vitest",
+    ],
+    categorie: "fullstack",
+    status: "completed",
+    github: "https://github.com/Hakiick/ChessGame",
+    video: "/images/projects/chessgame/chess-fighter-demo.mp4",
   },
 ];

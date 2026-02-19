@@ -1,8 +1,158 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import type { Project } from "../../data/projects";
 import { cn } from "../../lib/utils";
 import { DecryptText } from "./DecryptText";
 import { useLanguage } from "../../lib/useLanguage";
+
+function VideoPlayer({ src }: { src: string }) {
+  return (
+    <div className="mb-4">
+      <div
+        className="relative overflow-hidden rounded border"
+        style={{ borderColor: "var(--cyber-border)" }}
+      >
+        <video
+          src={src}
+          controls
+          playsInline
+          preload="metadata"
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+          className="h-auto w-full"
+          style={{ maxHeight: "400px" }}
+        >
+          <track kind="captions" />
+        </video>
+      </div>
+    </div>
+  );
+}
+
+function ScreenshotGallery({ screenshots }: { screenshots: string[] }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+
+  const validScreenshots = useMemo(
+    () => screenshots.filter((_, i) => !imageErrors.has(i)),
+    [screenshots, imageErrors],
+  );
+
+  if (validScreenshots.length === 0) return null;
+
+  const handlePrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveIndex((prev) =>
+      prev <= 0 ? validScreenshots.length - 1 : prev - 1,
+    );
+  };
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveIndex((prev) =>
+      prev >= validScreenshots.length - 1 ? 0 : prev + 1,
+    );
+  };
+
+  const handleImageError = (originalIndex: number) => {
+    setImageErrors((prev) => {
+      const updated = new Set(prev);
+      updated.add(originalIndex);
+      return updated;
+    });
+  };
+
+  return (
+    <div className="mb-4">
+      {/* Main image */}
+      <div
+        className="relative mb-2 overflow-hidden rounded border"
+        style={{ borderColor: "var(--cyber-border)" }}
+      >
+        <img
+          src={validScreenshots[activeIndex]}
+          alt={`Screenshot ${activeIndex + 1}`}
+          loading="lazy"
+          onError={() => {
+            const origIndex = screenshots.indexOf(
+              validScreenshots[activeIndex],
+            );
+            handleImageError(origIndex);
+          }}
+          className="h-auto w-full object-cover"
+          style={{ maxHeight: "280px" }}
+        />
+        {/* Navigation arrows */}
+        {validScreenshots.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={handlePrev}
+              aria-label="Previous screenshot"
+              className="absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border font-mono text-sm transition-opacity hover:opacity-100"
+              style={{
+                backgroundColor: "rgba(10, 10, 15, 0.8)",
+                borderColor: "var(--cyber-accent-green)",
+                color: "var(--cyber-accent-green)",
+                opacity: 0.7,
+              }}
+            >
+              &lt;
+            </button>
+            <button
+              type="button"
+              onClick={handleNext}
+              aria-label="Next screenshot"
+              className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border font-mono text-sm transition-opacity hover:opacity-100"
+              style={{
+                backgroundColor: "rgba(10, 10, 15, 0.8)",
+                borderColor: "var(--cyber-accent-green)",
+                color: "var(--cyber-accent-green)",
+                opacity: 0.7,
+              }}
+            >
+              &gt;
+            </button>
+          </>
+        )}
+        {/* Counter */}
+        <span
+          className="absolute bottom-2 right-2 rounded px-2 py-0.5 font-mono text-xs"
+          style={{
+            backgroundColor: "rgba(10, 10, 15, 0.8)",
+            color: "var(--cyber-text-secondary)",
+          }}
+        >
+          {activeIndex + 1}/{validScreenshots.length}
+        </span>
+      </div>
+      {/* Thumbnail dots */}
+      {validScreenshots.length > 1 && (
+        <div className="flex justify-center gap-1.5">
+          {validScreenshots.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveIndex(i);
+              }}
+              aria-label={`Go to screenshot ${i + 1}`}
+              className="h-1.5 rounded-full transition-all duration-200"
+              style={{
+                width: i === activeIndex ? "1.5rem" : "0.375rem",
+                backgroundColor:
+                  i === activeIndex
+                    ? "var(--cyber-accent-green)"
+                    : "var(--cyber-text-secondary)",
+                opacity: i === activeIndex ? 1 : 0.4,
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export interface ClassifiedCardProps {
   project: Project;
@@ -235,11 +385,19 @@ export function ClassifiedCard({
           <div
             className="transition-all duration-300 ease-in-out"
             style={{
-              maxHeight: isExpanded ? "600px" : "0px",
+              maxHeight: isExpanded ? "900px" : "0px",
               opacity: isExpanded ? 1 : 0,
               overflow: "hidden",
             }}
           >
+            {/* Video player */}
+            {project.video && <VideoPlayer src={project.video} />}
+
+            {/* Screenshots gallery */}
+            {project.screenshots && project.screenshots.length > 0 && (
+              <ScreenshotGallery screenshots={project.screenshots} />
+            )}
+
             {/* Description */}
             <p
               className="mb-4 text-sm leading-relaxed"
