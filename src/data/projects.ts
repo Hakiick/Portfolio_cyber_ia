@@ -139,10 +139,10 @@ export const projects: Project[] = [
     status: "completed",
     github: "https://github.com/Hakiick/T-POO-700-STG_1",
     screenshots: [
-      "/images/projects/timemanager/dashboard.webp",
-      "/images/projects/timemanager/clock.webp",
-      "/images/projects/timemanager/team.webp",
-      "/images/projects/timemanager/mobile.webp",
+      "/images/projects/timemanager/login-desktop.png",
+      "/images/projects/timemanager/login-mobile.png",
+      "/images/projects/timemanager/reset-password-desktop.png",
+      "/images/projects/timemanager/confirm-account-desktop.png",
     ],
   },
 ];
