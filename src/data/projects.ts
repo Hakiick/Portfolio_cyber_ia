@@ -37,77 +37,6 @@ export const projects: Project[] = [
     github: "",
   },
   {
-    id: "agent-discord-n8n",
-    titre: "Agent IA Discord — Résumés automatiques",
-    titreEn: "Discord AI Agent — Automated Summaries",
-    description:
-      "Agent automatisé qui résume les vidéos quotidiennes d'un YouTuber Pokémon. Pipeline : scraping vidéos → résumé LLM → publication Discord. Scalable à 20-30 chaînes.",
-    descriptionEn:
-      "Automated agent that summarizes daily Pokémon YouTuber videos. Pipeline: video scraping → LLM summary → Discord publication. Scalable to 20-30 channels.",
-    stack: ["n8n", "LLM API", "Discord Bot", "Node.js"],
-    categorie: "ia",
-    status: "in-progress",
-    github: "",
-  },
-  {
-    id: "chatbot-cyber",
-    titre: "Chatbot IA Cybersécurité",
-    titreEn: "Cybersecurity AI Chatbot",
-    description:
-      "Assistant IA spécialisé hacking/pentest. Support technique intelligent pour le contexte cyber : méthodologies, outils, exploitation.",
-    descriptionEn:
-      "AI assistant specialized in hacking/pentesting. Intelligent technical support for cyber context: methodologies, tools, exploitation.",
-    stack: ["Python", "LLM", "RAG", "Cybersecurity"],
-    categorie: "ia-cyber",
-    status: "in-progress",
-    github: "",
-  },
-  {
-    id: "nfc-hack",
-    titre: "NFC Reader Exploit",
-    titreEn: "NFC Reader Exploit",
-    description:
-      "Projet scolaire Epitech : exploitation d'un lecteur NFC pour intercepter et retransmettre des identifiants. Analyse de protocole, reverse engineering.",
-    descriptionEn:
-      "Epitech school project: exploiting an NFC reader to intercept and relay credentials. Protocol analysis, reverse engineering.",
-    stack: ["Hardware", "NFC", "Reverse Engineering", "C"],
-    categorie: "cyber",
-    status: "completed",
-    github: "",
-  },
-  {
-    id: "iot-domotique",
-    titre: "Domotique Cloud-Native",
-    titreEn: "Cloud-Native Smart Home",
-    description:
-      "Architecture domotique personnelle : capteurs Zigbee2MQTT, broker MQTT cloud (AWS IoT Core), analyse présence via capteurs de mouvement. Raspberry Pi + cloud.",
-    descriptionEn:
-      "Personal smart home architecture: Zigbee2MQTT sensors, cloud MQTT broker (AWS IoT Core), presence analysis via motion sensors. Raspberry Pi + cloud.",
-    stack: [
-      "Home Assistant",
-      "Zigbee2MQTT",
-      "MQTT",
-      "AWS IoT Core",
-      "Raspberry Pi",
-    ],
-    categorie: "cloud-iot",
-    status: "in-progress",
-    github: "",
-  },
-  {
-    id: "infra-k8s",
-    titre: "Cluster Kubernetes Production",
-    titreEn: "Production Kubernetes Cluster",
-    description:
-      "Conception et déploiement de clusters k0s virtualisés. Pipelines GitLab CI/CD complètes, monitoring Prometheus, déploiement containerisé.",
-    descriptionEn:
-      "Design and deployment of virtualized k0s clusters. Complete GitLab CI/CD pipelines, Prometheus monitoring, containerized deployment.",
-    stack: ["Kubernetes", "k0s", "GitLab CI/CD", "Prometheus", "Docker"],
-    categorie: "devops",
-    status: "completed",
-    github: "",
-  },
-  {
     id: "portfolio-multi-agent",
     titre: "Ce Portfolio (Meta-projet)",
     titreEn: "This Portfolio (Meta-project)",
@@ -162,5 +91,102 @@ export const projects: Project[] = [
     status: "completed",
     github: "https://github.com/Hakiick/ChessGame",
     video: "/images/projects/chessgame/chess-fighter-demo.mp4",
+  },
+  {
+    id: "nsa-banking-infra",
+    titre: "Infrastructure DevOps — App Bancaire HA",
+    titreEn: "DevOps Infrastructure — HA Banking App",
+    description:
+      "Application bancaire full-stack déployée sur infrastructure haute disponibilité multi-machines. Backend Node.js/TypeORM sécurisé (JWT, RBAC, bcrypt), frontend React/Redux, monitoring Zabbix centralisé, déploiement 0-downtime avec nginx load balancing et pipeline CI/CD GitHub Actions granulaire. Projet Epitech T-NSA-810 avec 251 commits.",
+    descriptionEn:
+      "Full-stack banking application deployed on multi-machine high-availability infrastructure. Secure Node.js/TypeORM backend (JWT, RBAC, bcrypt), React/Redux frontend, centralized Zabbix monitoring, 0-downtime deployment with nginx load balancing and granular GitHub Actions CI/CD pipeline. Epitech T-NSA-810 project with 251 commits.",
+    stack: [
+      "Node.js/TypeScript",
+      "React/Redux",
+      "Docker/Podman",
+      "Ansible",
+      "Zabbix",
+      "GitHub Actions",
+    ],
+    categorie: "devops",
+    status: "completed",
+    github: "https://github.com/Hakiick/T-NSA-810-STG_9",
+  },
+  {
+    id: "trelltech-mobile",
+    titre: "TrellTech — Client Trello Mobile",
+    titreEn: "TrellTech — Mobile Trello Client",
+    description:
+      "Client mobile Trello développé en React Native/Expo, implémentant la hiérarchie complète de gestion de projets (workspaces, boards, lists, cartes, membres) via intégration API REST native. Architecture multi-écrans avec routage Expo Router et TypeScript strict. Projet Epitech T-DEV-600.",
+    descriptionEn:
+      "Native Trello mobile client built with React Native and Expo, implementing full project management hierarchy (workspaces, boards, lists, cards, members) through native REST API integration. Multi-screen architecture with Expo Router and strict TypeScript. Epitech T-DEV-600 project.",
+    stack: [
+      "React Native",
+      "Expo",
+      "TypeScript",
+      "Trello API",
+      "React Navigation",
+    ],
+    categorie: "fullstack",
+    status: "completed",
+    github: "https://github.com/Hakiick/T-DEV-600-STG_18",
+  },
+  {
+    id: "cloud-paas-azure",
+    titre: "PaaS Azure — Infrastructure Cloud",
+    titreEn: "Azure PaaS — Cloud Infrastructure",
+    description:
+      "Déploiement PaaS complet sur Azure avec Infrastructure-as-Code Terraform. Pipeline d'automation couvrant containerisation Docker (ACR), MySQL Flexible Server sécurisé SSL/TLS, monitoring Azure Monitor avec alerting multi-canal et validation des performances via load testing Locust. Projet Epitech T-CLO-901.",
+    descriptionEn:
+      "End-to-end PaaS deployment on Microsoft Azure using Terraform Infrastructure-as-Code. Automation pipeline spanning Docker containerization (ACR), SSL/TLS-secured MySQL Flexible Server, Azure Monitor with multi-channel alerting and Locust load testing performance validation. Epitech T-CLO-901 project.",
+    stack: ["Terraform", "Azure", "Docker", "MySQL", "Azure Monitor", "Bash"],
+    categorie: "devops",
+    status: "completed",
+    github: "https://github.com/Hakiick/T-CLO-901-STG_10",
+  },
+  {
+    id: "bombcrypto-bot",
+    titre: "Bombcrypto Bot — Automatisation RPA",
+    titreEn: "Bombcrypto Bot — RPA Automation",
+    description:
+      "Bot RPA autonome pour jeu blockchain Bombcrypto. Reconnaissance de patterns d'écran via template matching (80+ templates PNG), orchestration multi-session parallèle avec stratégies d'attaque tierisées et gestion intelligente du cooldown. Architecture modulaire avec mécanismes de résilience et retry.",
+    descriptionEn:
+      "Autonomous RPA bot for Bombcrypto blockchain game. Screen pattern recognition via template matching (80+ PNG templates), parallel multi-session orchestration with tiered attack strategies and intelligent cooldown management. Modular architecture with resilience mechanisms and retry logic.",
+    stack: ["Python", "PyAutoGUI", "Computer Vision", "RPA"],
+    categorie: "ia",
+    status: "completed",
+    github: "https://github.com/Hakiick/Bombcrypto_bot_2021",
+  },
+  {
+    id: "winonebitcoin-bot",
+    titre: "WinOneBitcoin — Bot Binance",
+    titreEn: "WinOneBitcoin — Binance Bot",
+    description:
+      "Bot d'automatisation d'interface Binance exploitant la vision par ordinateur pour la détection temps réel de séquences visuelles (57 états d'UI). Pipeline de données multi-threadé avec export Excel et notifications push via API Pushover.",
+    descriptionEn:
+      "Binance interface automation bot leveraging computer vision for real-time visual sequence detection (57 UI states). Multi-threaded data pipeline with Excel export and push notifications via Pushover API.",
+    stack: [
+      "Python",
+      "PyAutoGUI",
+      "Computer Vision",
+      "Multi-threading",
+      "Pandas",
+    ],
+    categorie: "ia",
+    status: "completed",
+    github: "https://github.com/Hakiick/WinOneBitcoin_2022",
+  },
+  {
+    id: "swc-bot",
+    titre: "SWC Bot — Automatisation RPG Mobile",
+    titreEn: "SWC Bot — Mobile RPG Automation",
+    description:
+      "Bot d'automatisation pour jeu mobile RPG implémentant 30+ scénarios de gameplay automatisés (arènes, donjons, expéditions, minage) avec seuils de confiance adaptatifs et optimisation par régions d'intérêt. Architecture modulaire multi-plateforme Windows/Linux.",
+    descriptionEn:
+      "Mobile RPG game automation bot implementing 30+ automated gameplay scenarios (arenas, dungeons, expeditions, mining) with adaptive confidence thresholds and region-of-interest optimization. Cross-platform modular architecture for Windows and Linux.",
+    stack: ["Python", "PyAutoGUI", "OpenCV", "Template Matching", "RPA"],
+    categorie: "ia",
+    status: "completed",
+    github: "https://github.com/Hakiick/SWC_Bot_2022",
   },
 ];
