@@ -4,7 +4,8 @@ export type ProjectCategory =
   | "ia-cyber"
   | "cloud-iot"
   | "devops"
-  | "ia-meta";
+  | "ia-meta"
+  | "fullstack";
 export type ProjectStatus = "completed" | "in-progress";
 
 export interface Project {
@@ -17,6 +18,7 @@ export interface Project {
   categorie: ProjectCategory;
   status: ProjectStatus;
   github: string;
+  screenshots?: string[];
 }
 
 export const projects: Project[] = [
@@ -116,5 +118,33 @@ export const projects: Project[] = [
     categorie: "ia-meta",
     status: "in-progress",
     github: "https://github.com/juninhomax/Portfolio_cyber_ia",
+  },
+  {
+    id: "timemanager",
+    titre: "TimeManager — Gestion du temps de travail",
+    titreEn: "TimeManager — Work Time Management",
+    description:
+      "Application full-stack de gestion des heures de travail : clock in/out, gestion d'équipes, suivi des heures supplémentaires, dashboard admin. Backend Elixir/Phoenix + PostgreSQL, frontend Vue 3 rebuild mobile-first avec animations fluides, PWA offline-first et design responsive. Projet Epitech T-POO-700 avec 275+ commits.",
+    descriptionEn:
+      "Full-stack work time management application: clock in/out, team management, overtime tracking, admin dashboard. Elixir/Phoenix + PostgreSQL backend, Vue 3 frontend rebuilt mobile-first with smooth animations, offline-first PWA and responsive design. Epitech T-POO-700 project with 275+ commits.",
+    stack: [
+      "Vue 3",
+      "TypeScript",
+      "Elixir/Phoenix",
+      "PostgreSQL",
+      "Tailwind CSS",
+      "PWA",
+    ],
+    categorie: "fullstack",
+    status: "completed",
+    github: "https://github.com/Hakiick/T-POO-700-STG_1",
+    screenshots: [
+      "/images/projects/timemanager/home-desktop.png",
+      "/images/projects/timemanager/home-mobile.png",
+      "/images/projects/timemanager/admin-users-desktop.png",
+      "/images/projects/timemanager/admin-teams-desktop.png",
+      "/images/projects/timemanager/dashboard-desktop.png",
+      "/images/projects/timemanager/dashboard-mobile.png",
+    ],
   },
 ];
