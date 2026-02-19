@@ -19,6 +19,7 @@ export interface Project {
   status: ProjectStatus;
   github: string;
   screenshots?: string[];
+  video?: string;
 }
 
 export const projects: Project[] = [
@@ -146,5 +147,27 @@ export const projects: Project[] = [
       "/images/projects/timemanager/dashboard-desktop.png",
       "/images/projects/timemanager/dashboard-mobile.png",
     ],
+  },
+  {
+    id: "chess-fighter",
+    titre: "Chess Fighter — Jeu d'échecs thématique",
+    titreEn: "Chess Fighter — Themed Chess Game",
+    description:
+      "Jeu d'échecs complet avec des thèmes visuels immersifs (Classic, Marvel, Neon, Pokémon). Animations fluides Framer Motion, responsive mobile-first, effets sonores, confettis de victoire. Projet Epitech construit avec Next.js 14 et orchestré par une architecture multi-agents Claude Code.",
+    descriptionEn:
+      "Full chess game with immersive visual themes (Classic, Marvel, Neon, Pokémon). Smooth Framer Motion animations, mobile-first responsive, sound effects, victory confetti. Epitech project built with Next.js 14 and orchestrated by a Claude Code multi-agent architecture.",
+    stack: [
+      "Next.js 14",
+      "React 18",
+      "TypeScript",
+      "Framer Motion",
+      "Tailwind CSS",
+      "Playwright",
+      "Vitest",
+    ],
+    categorie: "fullstack",
+    status: "completed",
+    github: "https://github.com/Hakiick/ChessGame",
+    video: "/images/projects/chessgame/chess-fighter-demo.mp4",
   },
 ];

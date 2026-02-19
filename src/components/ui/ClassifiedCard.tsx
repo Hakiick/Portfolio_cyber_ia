@@ -4,6 +4,30 @@ import { cn } from "../../lib/utils";
 import { DecryptText } from "./DecryptText";
 import { useLanguage } from "../../lib/useLanguage";
 
+function VideoPlayer({ src }: { src: string }) {
+  return (
+    <div className="mb-4">
+      <div
+        className="relative overflow-hidden rounded border"
+        style={{ borderColor: "var(--cyber-border)" }}
+      >
+        <video
+          src={src}
+          controls
+          playsInline
+          preload="metadata"
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+          className="h-auto w-full"
+          style={{ maxHeight: "400px" }}
+        >
+          <track kind="captions" />
+        </video>
+      </div>
+    </div>
+  );
+}
+
 function ScreenshotGallery({ screenshots }: { screenshots: string[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
@@ -366,6 +390,9 @@ export function ClassifiedCard({
               overflow: "hidden",
             }}
           >
+            {/* Video player */}
+            {project.video && <VideoPlayer src={project.video} />}
+
             {/* Screenshots gallery */}
             {project.screenshots && project.screenshots.length > 0 && (
               <ScreenshotGallery screenshots={project.screenshots} />
