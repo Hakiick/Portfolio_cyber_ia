@@ -139,14 +139,7 @@ export const projects: Project[] = [
     categorie: "fullstack",
     status: "completed",
     github: "https://github.com/Hakiick/T-POO-700-STG_1",
-    screenshots: [
-      "/images/projects/timemanager/home-desktop.png",
-      "/images/projects/timemanager/home-mobile.png",
-      "/images/projects/timemanager/admin-users-desktop.png",
-      "/images/projects/timemanager/admin-teams-desktop.png",
-      "/images/projects/timemanager/dashboard-desktop.png",
-      "/images/projects/timemanager/dashboard-mobile.png",
-    ],
+    video: "/images/projects/timemanager/timemanager-demo.mp4",
   },
   {
     id: "chess-fighter",
