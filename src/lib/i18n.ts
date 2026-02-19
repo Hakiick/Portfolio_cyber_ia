@@ -85,6 +85,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "projects.filter.cyber": "Cyber",
     "projects.filter.devops": "DevOps",
     "projects.filter.iot": "IoT",
+    "projects.filter.web": "Web",
     "projects.status.completed": "Complété",
     "projects.status.in-progress": "En cours",
 
@@ -209,6 +210,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "projects.filter.cyber": "Cyber",
     "projects.filter.devops": "DevOps",
     "projects.filter.iot": "IoT",
+    "projects.filter.web": "Web",
     "projects.status.completed": "Completed",
     "projects.status.in-progress": "In progress",
 

@@ -18,6 +18,7 @@ const FILTERS: FilterConfig[] = [
   { label: "projects.filter.cyber", categories: ["cyber", "ia-cyber"] },
   { label: "projects.filter.devops", categories: ["devops"] },
   { label: "projects.filter.iot", categories: ["cloud-iot"] },
+  { label: "projects.filter.web", categories: ["fullstack"] },
 ];
 
 function filterProjects(categories: ProjectCategory[] | null) {
